@@ -1,17 +1,17 @@
 (function () {
-	chrome.runtime.onMessage.addListener(function (message) {
-		var messages;
-		
-		function storeMessages(receivedMessages) {
-			messages = receivedMessages;
-			
-			return receivedMessages;
-		}
-		
-		function switchLabels() {
-			return api.switchLabels(messages)
-		}
-		
+    chrome.runtime.onMessage.addListener(function (message) {
+        var messages;
+
+        function storeMessages(receivedMessages) {
+            messages = receivedMessages;
+
+            return receivedMessages;
+        }
+
+        function switchLabels() {
+            return api.switchLabels(messages)
+        }
+
         if (message === 'olx.run') {
             console.log('Starting process');
 
@@ -27,5 +27,5 @@
                     console.error('Flow broken', e);
                 });
         }
-	});
+    });
 }());

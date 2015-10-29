@@ -1,29 +1,29 @@
 {
-	"manifest_version": 2,
-	"name": "OLX Relister",
-	"description": "Looks through your email and clicks stuff.",
-	"version": "0.9.3",
-	"browser_action": {
-		"default_icon": "img/ico.png",
+    "manifest_version": 2,
+    "name": "OLX Relister",
+    "description": "Looks through your email and clicks stuff.",
+    "version": "0.9.3",
+    "browser_action": {
+        "default_icon": "img/ico.png",
         "default_popup": "popup.html"
-	},
-	"background": {
-		"scripts": ["lib/moment.js", "lib/q.js", "lib/gapi.js", "settings.js", "requester.js", "msg-parser.js", "api-wrapper.js", "main.js"],
-		"persistent": false
-	},
-	"permissions": [
-		"alarms",
-		"storage",
-		"tabs",
-		"identity",
-		"http://*/",
-		"https://*/"
-	],
-	"content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
-	"oauth2": {
-		"client_id": "113558311566-o2ce28ic2rv5j5j2rvmmqebd6q7gq7cb.apps.googleusercontent.com",
-		"scopes": [
-			"https://www.googleapis.com/auth/gmail.modify"
-		]
-	}
+    },
+    "background": {
+        "scripts": ["lib/moment.js", "lib/q.js", "lib/gapi.js", "settings.js", "requester.js", "msg-parser.js", "api-wrapper.js", "main.js"],
+        "persistent": false
+    },
+    "permissions": [
+        "alarms",
+        "storage",
+        "tabs",
+        "identity",
+        "http://*/",
+        "https://*/"
+    ],
+    "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
+    "oauth2": {
+        "client_id": "113558311566-o2ce28ic2rv5j5j2rvmmqebd6q7gq7cb.apps.googleusercontent.com",
+        "scopes": [
+            "https://www.googleapis.com/auth/gmail.modify"
+        ]
+    }
 }

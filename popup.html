@@ -1,20 +1,30 @@
 <html>
-    <head>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
-        <link rel="stylesheet" href="popup-styles.css">
-    </head>
-    <body>
-        <p id="from-container"><label for="labelFrom">Szukaj labelki: </label><input class="form-control" type="text" name="labelFrom"></p>
-        <p id="to-container"><label for="labelTo">Zamień na labelkę: </label><input class="form-control" type="text" name="labelTo"></p>
-        <p><input type="checkbox" name="markAsRead"><span>Oznaczaj jako przeczytane</span></p>
-        <p><input type="checkbox" name="removeFromInbox"><span>Wyrzucaj z odebranych</span></p>
-        <p>Następne sprawdzenie: &lt;Jak zaimplementuję timer&gt;<span></span></p>
-        <p class="text-center"><input class="btn btn-primary" type="button" name="save" value="Zapisz"> <input class="btn btn-default" type="button" name="force" value="Wymuś cykl"></p>
-        <script src="lib/q.js"></script>
-        <script src="lib/moment.js"></script>
-        <script src="lib/gapi.js"></script>
-        <script src="api-wrapper.js"></script>
-        <script src="settings.js"></script>
-        <script src="popup.js"></script>
-    </body>
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
+          integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ=="
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="popup-styles.css">
+</head>
+<body>
+<p id="from-container"><label for="labelFrom">Szukaj labelki: </label><input class="form-control" type="text"
+                                                                             name="labelFrom"></p>
+
+<p id="to-container"><label for="labelTo">Zamień na labelkę: </label><input class="form-control" type="text"
+                                                                            name="labelTo"></p>
+
+<p><input type="checkbox" name="markAsRead"><span>Oznaczaj jako przeczytane</span></p>
+
+<p><input type="checkbox" name="removeFromInbox"><span>Wyrzucaj z odebranych</span></p>
+
+<p>Następne sprawdzenie: &lt;Jak zaimplementuję timer&gt;<span></span></p>
+
+<p class="text-center"><input class="btn btn-primary" type="button" name="save" value="Zapisz"> <input
+        class="btn btn-default" type="button" name="force" value="Wymuś cykl"></p>
+<script src="lib/q.js"></script>
+<script src="lib/moment.js"></script>
+<script src="lib/gapi.js"></script>
+<script src="api-wrapper.js"></script>
+<script src="settings.js"></script>
+<script src="popup.js"></script>
+</body>
 </html>

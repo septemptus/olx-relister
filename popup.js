@@ -16,7 +16,7 @@
         }, 500);
     }
 
-	function loadOptions() {
+    function loadOptions() {
         settings.load().then(function (settings) {
             if (settings.labelFrom) {
                 api.getLabel(settings.labelFrom).then(function (label) {
@@ -33,9 +33,9 @@
             markAsReadEl.checked = settings.markAsRead;
             removeFromInboxEl.checked = settings.removeFromInbox;
         }).fail(function (e) {
-            console.error('Failed to load settings', e);
-        });
-	}
+                console.error('Failed to load settings', e);
+            });
+    }
 
     function save() {
         var setting = {};
@@ -63,7 +63,7 @@
         chrome.runtime.sendMessage('olx.run');
     }
 
-	document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
         fromContainerEl = document.querySelector('#from-container');
         toContainerEl = document.querySelector('#to-container');
         labelFromEl = document.querySelector('[name=labelFrom]');

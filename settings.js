@@ -10,8 +10,8 @@
     function convertLabel(labelName) {
         return api.getLabels().then(function (response) {
             var label = response.result.labels.filter(function (label) {
-                    return label.name === labelName;
-                });
+                return label.name === labelName;
+            });
 
             if (!label.length) {
                 console.error('Label not found', labelName);
@@ -48,8 +48,8 @@
 
             return deferred.promise;
         }).then(function () {
-            console.log('Settings saved');
-        });
+                console.log('Settings saved');
+            });
     }
 
     function load() {
