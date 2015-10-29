@@ -1,0 +1,34 @@
+html {
+    height: 0;
+}
+
+body {
+    height: 0;
+    width: 300px;
+    padding: 15px;
+    transition: background-color 0.5s linear;
+}
+
+p {
+    padding: 5px 0;
+}
+
+input + span {
+    margin-left: 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+input[type=checkbox] {
+    margin: 0;
+    vertical-align: middle;
+}
+
+.success {
+    background-color: #dff0d8;
+}
+
+.error {
+    background-color: #cf0433;
+}
+
