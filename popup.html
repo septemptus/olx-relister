@@ -2,7 +2,9 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="lib/bootstrap.min.css">
+    <!-- build:css -->
     <link rel="stylesheet" href="popup-styles.css">
+    <!-- endbuild -->
 </head>
 <body>
 <p id="from-container"><label for="labelFrom">Szukaj labelki: </label><input class="form-control" type="text"
@@ -19,11 +21,13 @@
 
 <p class="text-center"><input class="btn btn-primary" type="button" name="save" value="Zapisz"> <input
         class="btn btn-default" type="button" name="force" value="Wymuś cykl"></p>
-<script src="lib/q.js"></script>
-<script src="lib/moment.js"></script>
+<script src="lib/q.min.js"></script>
+<script src="lib/moment.min.js"></script>
 <script src="lib/gapi.js"></script>
+<!-- build:js -->
 <script src="api-wrapper.js"></script>
 <script src="settings.js"></script>
 <script src="popup.js"></script>
+<!-- endbuild -->
 </body>
 </html>
