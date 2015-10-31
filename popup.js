@@ -77,5 +77,15 @@
         forceButtonEl.addEventListener('click', sendEvent);
     });
 
+    chrome.runtime.onMessage.addListener(function (message) {
+        if (message === 'olx.cycle-end') {
+            flash('success');
+        }
+
+        if (message === 'olx.cycle-failed') {
+            flash('error');
+        }
+    });
+
     window.onload = loadOptions;
 }());

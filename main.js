@@ -22,9 +22,11 @@
                 .then(switchLabels)
                 .then(function () {
                     console.log('Task successful!');
+                    chrome.runtime.sendMessage('olx.cycle-end');
                 })
                 .fail(function (e) {
                     console.error('Flow broken', e);
+                    chrome.runtime.sendMessage('olx.cycle-failed');
                 });
         }
     });
