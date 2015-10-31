@@ -1,13 +1,13 @@
 {
   "name": "olx_relister",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "description": "Looks through your email and clicks stuff.",
   "repository": {
     "type": "git",
     "url": "https://github.com/septemptus/olx-relister.git"
   },
   "author": "septemptus",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/septemptus/olx-relister/issues"
   },
