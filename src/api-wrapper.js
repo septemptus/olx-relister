@@ -4,7 +4,7 @@
 
     var INBOX_LABEL = 'INBOX',
         UNREAD_LABEL = 'UNREAD',
-        clientId = '113558311566-o2ce28ic2rv5j5j2rvmmqebd6q7gq7cb.apps.googleusercontent.com',
+        clientId = '113558311566-rcfi51rf2e1p5jbn6rcf5ur8m4bnft9m.apps.googleusercontent.com',
         scope = 'https://www.googleapis.com/auth/gmail.modify',
         authorizationExpiryTime = null;
 
