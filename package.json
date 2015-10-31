@@ -1,6 +1,6 @@
 {
   "name": "olx_relister",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "description": "Looks through your email and clicks stuff.",
   "repository": {
     "type": "git",
@@ -22,7 +22,6 @@
     "gulp-minify-css": "^1.2.1",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.4.2",
-    "gulp-zip": "^3.0.2",
-    "merge-stream": "^1.0.0"
+    "gulp-zip": "^3.0.2"
   }
 }
