@@ -30,7 +30,7 @@
     ],
     "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
     "oauth2": {
-        "client_id": "113558311566-o2ce28ic2rv5j5j2rvmmqebd6q7gq7cb.apps.googleusercontent.com",
+        "client_id": "113558311566-rcfi51rf2e1p5jbn6rcf5ur8m4bnft9m.apps.googleusercontent.com",
         "scopes": [
             "https://www.googleapis.com/auth/gmail.modify"
         ]

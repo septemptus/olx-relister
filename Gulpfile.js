@@ -3,6 +3,7 @@
    'use strict';
 
     var gulp = require('gulp'),
+        replace = require('gulp-replace'),
         rename = require('gulp-rename'),
         clean = require('gulp-clean'),
         minifycss = require('gulp-minify-css'),
@@ -53,6 +54,7 @@
 
     gulp.task('minify', ['clean-build'], function () {
         return gulp.src(['src/*.js', '!src/popup.js'])
+            .pipe(replace('113558311566-rcfi51rf2e1p5jbn6rcf5ur8m4bnft9m.apps.googleusercontent.com', '113558311566-o2ce28ic2rv5j5j2rvmmqebd6q7gq7cb.apps.googleusercontent.com'))
             .pipe(uglify())
             .pipe(concat('olx-relister.min.js'))
             .pipe(gulp.dest('build'));
@@ -68,6 +70,7 @@
         return gulp.src('src/manifest.json')
             .pipe(jsonedit(function (json) {
                 json.background.scripts = ["lib/moment.min.js", "lib/q.min.js", "lib/gapi.js", "olx-relister.min.js"];
+                json.oauth2.client_id = '113558311566-o2ce28ic2rv5j5j2rvmmqebd6q7gq7cb.apps.googleusercontent.com';
                 return json;
             }))
             .pipe(gulp.dest('build'));
