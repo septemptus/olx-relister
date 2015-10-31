@@ -83,7 +83,7 @@ gulp.task('copy-assets', ['copy-html', 'copy-images', 'clean-dist']);
 gulp.task('build', ['copy-lib', 'copy-assets', 'modify-manifest', 'styles', 'minify', 'minify-popup-script']);
 
 gulp.task('release', ['clean-rel', 'build', 'bump-versions'], function () {
-    return gulp.src('dist/*')
+    return gulp.src('dist/**')
         .pipe(zip('olx-relister.zip'))
         .pipe(gulp.dest('rel'));
 });
