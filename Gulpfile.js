@@ -6,7 +6,8 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
     htmlreplace = require('gulp-html-replace'),
     bump = require('gulp-bump'),
-    jsonedit = require('gulp-json-editor');
+    jsonedit = require('gulp-json-editor'),
+    zip = require('gulp-zip');
 
 function getBumpType() {
     var args = process.argv;
@@ -83,6 +84,7 @@ gulp.task('build', ['copy-lib', 'copy-assets', 'modify-manifest', 'styles', 'min
 
 gulp.task('release', ['clean-rel', 'build', 'bump-versions'], function () {
     return gulp.src('dist/*')
+        .pipe(zip('olx-relister.zip'))
         .pipe(gulp.dest('rel'));
 });
 
