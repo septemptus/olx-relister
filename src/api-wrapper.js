@@ -1,4 +1,7 @@
+/* global console, Q, moment, gapi, settings */
 (function () {
+    'use strict';
+
     var INBOX_LABEL = 'INBOX',
         UNREAD_LABEL = 'UNREAD',
         clientId = '113558311566-o2ce28ic2rv5j5j2rvmmqebd6q7gq7cb.apps.googleusercontent.com',

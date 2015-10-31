@@ -1,0 +1,11 @@
+{
+    "curly": true,
+    "eqeqeq": true,
+    "forin": true,
+    "globals": true,
+    "strict": true,
+    "undef": true,
+    "unused": true,
+    "jasmine": true,
+    "browser": true
+}

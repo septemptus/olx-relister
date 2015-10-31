@@ -1,4 +1,6 @@
+/* global console, Q */
 (function () {
+    "use strict";
     function request(urls) {
         var promises = [];
 

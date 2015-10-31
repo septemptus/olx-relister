@@ -1,4 +1,7 @@
+/* global chrome, api, console, msgParser, requester */
 (function () {
+    'use strict';
+
     chrome.runtime.onMessage.addListener(function (message) {
         var messages;
 
@@ -9,7 +12,7 @@
         }
 
         function switchLabels() {
-            return api.switchLabels(messages)
+            return api.switchLabels(messages);
         }
 
         if (message === 'olx.run') {

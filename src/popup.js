@@ -1,4 +1,7 @@
+/* global settings, api, console, chrome */
 (function () {
+    'use strict';
+
     var labelFromEl,
         labelToEl,
         markAsReadEl,

@@ -1,4 +1,7 @@
+/* global Q, console */
 (function () {
+    'use strict';
+
     var linkRegExp = /https:\/\/ssl.olx.pl\/oferta\/(?:przedluz|refreshall)[^"]+/;
 
     function getLinks(messages) {

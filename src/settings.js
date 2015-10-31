@@ -1,4 +1,7 @@
+/* global api, console, Q, chrome */
 (function () {
+    'use strict';
+
     var DEFAULTS = {
         labelFrom: null,
         labelTo: null,

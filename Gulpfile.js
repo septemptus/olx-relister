@@ -7,7 +7,9 @@ var gulp = require('gulp'),
     htmlreplace = require('gulp-html-replace'),
     bump = require('gulp-bump'),
     jsonedit = require('gulp-json-editor'),
-    zip = require('gulp-zip');
+    jshint = require('gulp-jshint'),
+    zip = require('gulp-zip'),
+    Server = require('karma').Server;
 
 function getBumpType() {
     var args = process.argv;
@@ -23,7 +25,7 @@ function getBumpType() {
     return 'patch';
 }
 
-gulp.task('clean-build', function () {
+gulp.task('clean-build', ['lint', 'test'], function () {
     return gulp.src('build')
         .pipe(clean());
 });
@@ -107,5 +109,19 @@ gulp.task('bump-dist-manifest-ver', ['clean-rel', 'build'], function () {
 });
 
 gulp.task('bump-versions', ['build', 'bump-package-ver', 'bump-manifest-ver', 'bump-dist-manifest-ver']);
+
+gulp.task('test', function (done) {
+    new Server({
+        configFile: process.cwd() + '\\test\\karma.conf.js',
+        singleRun: true
+    }, done).start();
+});
+
+gulp.task('lint', function () {
+    return gulp.src(['./src/*.js', './test/**/*.js'])
+        .pipe(jshint())
+        .pipe(jshint.reporter('jshint-stylish'))
+        .pipe(jshint.reporter('fail'));
+});
 
 gulp.task('default', ['build']);
