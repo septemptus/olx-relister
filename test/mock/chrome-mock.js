@@ -10,9 +10,19 @@
         },
         runtime: {
             onMessage: {
-                addListener: noop
+                listeners: [],
+                addListener: function (fn) {
+                    this.listeners.push(fn);
+                },
+                removeLastListener: function () {
+                    this.listeners.pop();
+                }
             },
-            sendMessage: noop
+            sendMessage: function (msg) {
+                this.onMessage.listeners.forEach(function (listener) {
+                    listener(msg);
+                });
+            }
         },
         storage: {
             sync: {

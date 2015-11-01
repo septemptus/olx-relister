@@ -2,10 +2,13 @@
 (function () {
     'use strict';
 
-    var api = new ApiWrapper();
+    var cycleInProgress = false,
+        api;
 
     chrome.runtime.onMessage.addListener(function (message) {
         var messages;
+
+        api = api || new ApiWrapper();
 
         function storeMessages(receivedMessages) {
             messages = receivedMessages;
@@ -18,6 +21,14 @@
         }
 
         if (message === 'olx.run') {
+            if (cycleInProgress) {
+                console.warn('Cycle not started, one is already in progress');
+                chrome.runtime.sendMessage('olx.cycle-in-progress');
+                return;
+            }
+
+            cycleInProgress = true;
+
             console.log('Starting process');
 
             api.getMessages()
@@ -26,10 +37,12 @@
                 .then(requester.request)
                 .then(switchLabels)
                 .then(function () {
+                    cycleInProgress = false;
                     console.log('Task successful!');
                     chrome.runtime.sendMessage('olx.cycle-end');
                 })
                 .fail(function (e) {
+                    cycleInProgress = false;
                     console.error('Flow broken', e);
                     chrome.runtime.sendMessage('olx.cycle-failed');
                 });
