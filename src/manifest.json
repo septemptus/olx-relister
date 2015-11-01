@@ -4,8 +4,12 @@
     "description": "Looks through your email and clicks stuff.",
     "version": "0.11.7",
     "browser_action": {
-        "default_icon": "img/ico.png",
         "default_popup": "popup/popup.html"
+    },
+    "icons": {
+        "16": "img/ico16.png",
+        "48": "img/ico48.png",
+        "120": "img/ico120.png"
     },
     "background": {
         "scripts": [
