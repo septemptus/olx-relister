@@ -6,7 +6,8 @@
         UNREAD_LABEL = 'UNREAD',
         clientId = '113558311566-rcfi51rf2e1p5jbn6rcf5ur8m4bnft9m.apps.googleusercontent.com',
         scope = 'https://www.googleapis.com/auth/gmail.modify',
-        authorizationExpiryTime = null;
+        authorizationExpiryTime = null,
+        labelMap;
 
     function authorize(immediate) {
         var deferred = Q.defer();
@@ -66,13 +67,25 @@
         return deferred.promise;
     }
 
+    function verifyLabels(from, to) {
+        if (from && !labelMap[from]) {
+            throw 'Source label does not exist';
+        }
+
+        if (to && !labelMap[to]) {
+            throw 'Target label does not exist';
+        }
+    }
+
     function loadMessages() {
         return settings.load().then(function (settings) {
             var deferred = Q.defer(),
                 listParameters = { userId: 'me' };
 
+            verifyLabels(settings.labelFrom, settings.labelTo);
+
             if (settings.labelFrom) {
-                listParameters.labelIds = settings.labelFrom;
+                listParameters.labelIds = labelMap[settings.labelFrom];
             }
 
             console.log('Loading messages');
@@ -138,7 +151,7 @@
             }
 
             if (settings.labelFrom) {
-                labelsToRemove.push(settings.labelFrom);
+                labelsToRemove.push(labelMap[settings.labelFrom]);
             }
 
             if (settings.markAsRead) {
@@ -154,7 +167,7 @@
             gapi.client.gmail.users.messages.modify({
                 userId: 'me',
                 id: message.id,
-                addLabelIds: [settings.labelTo],
+                addLabelIds: settings.labelTo && [labelMap[settings.labelTo]],
                 removeLabelIds: labelsToRemove
             }).then(deferred.resolve, deferred.reject);
 
@@ -167,27 +180,16 @@
 
         console.log('Getting labels');
 
-        loadGmailApi()
-            .then(authorize.bind(null, true))
-            .then(function () {
-                gapi.client.gmail.users.labels.list({ userId: 'me' }).then(deferred.resolve, deferred.reject);
+        gapi.client.gmail.users.labels.list({ userId: 'me' }).then(function (response) {
+            var map = {};
+
+            response.result.labels.forEach(function (label) {
+                map[label.name] = label.id;
             });
 
-        return deferred.promise;
-    }
-
-    function getLabel(labelId) {
-        var deferred = Q.defer();
-
-        console.log('Getting label name for', labelId);
-
-        loadGmailApi()
-            .then(authorize.bind(null, true))
-            .then(function () {
-                gapi.client.gmail.users.labels.get({ userId: 'me', id: labelId }).then(function (response) {
-                    deferred.resolve(response.result.name);
-                }, deferred.reject);
-            });
+            labelMap = map;
+            deferred.resolve(map);
+        }, deferred.reject);
 
         return deferred.promise;
     }
@@ -195,13 +197,12 @@
     function getMessages() {
         return loadGmailApi()
             .then(authorize.bind(null, true))
+            .then(getLabels)
             .then(loadMessages)
             .then(parseMessages);
     }
 
     window.api = {
-        getLabel: getLabel,
-        getLabels: getLabels,
         switchLabels: switchLabels,
         getMessages: getMessages
     };

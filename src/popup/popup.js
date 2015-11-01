@@ -21,18 +21,8 @@
 
     function loadOptions() {
         settings.load().then(function (settings) {
-            if (settings.labelFrom) {
-                api.getLabel(settings.labelFrom).then(function (label) {
-                    labelFromEl.value = label;
-                });
-            }
-
-            if (settings.labelTo) {
-                api.getLabel(settings.labelTo).then(function (label) {
-                    labelToEl.value = label;
-                });
-            }
-
+            labelFromEl.value = settings.labelFrom;
+            labelToEl.value = settings.labelTo;
             markAsReadEl.checked = settings.markAsRead;
             removeFromInboxEl.checked = settings.removeFromInbox;
         }).fail(function (e) {

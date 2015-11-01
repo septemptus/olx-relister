@@ -1,4 +1,4 @@
-/* global api, console, Q, chrome */
+/* global console, Q, chrome */
 (function () {
     'use strict';
 
@@ -10,49 +10,16 @@
         removeFromInbox: false
     };
 
-    function convertLabel(labelName) {
-        return api.getLabels().then(function (response) {
-            var label = response.result.labels.filter(function (label) {
-                return label.name === labelName;
-            });
-
-            if (!label.length) {
-                console.error('Label not found', labelName);
-                throw 'Label not found';
-            }
-
-            return label[0].id;
-        });
-    }
-
     function save(setting) {
-        var deferred = Q.defer(),
-            labelConversions = [];
+        var deferred = Q.defer();
 
-        if (setting.labelFrom) {
-            console.log('Converting label', setting.labelFrom);
-            labelConversions.push(convertLabel(setting.labelFrom).then(function (convertedLabel) {
-                console.log('Converted', setting.labelFrom, 'to', convertedLabel);
-                setting.labelFrom = convertedLabel;
-            }));
-        }
+        console.log('Saving settings', setting);
+        chrome.storage.sync.set(setting, function () {
+            console.log('Settings saved');
+            deferred.resolve();
+        });
 
-        if (setting.labelTo) {
-            console.log('Converting label', setting.labelTo);
-            labelConversions.push(convertLabel(setting.labelTo).then(function (convertedLabel) {
-                console.log('Converted', setting.labelTo, 'to', convertedLabel);
-                setting.labelTo = convertedLabel;
-            }));
-        }
-
-        return Q.all(labelConversions).then(function () {
-            console.log('Saving settings', setting);
-            chrome.storage.sync.set(setting, deferred.resolve);
-
-            return deferred.promise;
-        }).then(function () {
-                console.log('Settings saved');
-            });
+        return deferred.promise;
     }
 
     function load() {
