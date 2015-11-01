@@ -9,3 +9,4 @@ TODO
 - Move API requests out of the popup
 - Add error indication
 - Add interval timer
+- Chrome notifications

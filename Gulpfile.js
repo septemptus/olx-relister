@@ -46,10 +46,10 @@
     });
 
     gulp.task('styles', ['clean-build'], function () {
-        return gulp.src('src/styles/*.css')
+        return gulp.src('src/popup/*.css')
             .pipe(minifycss())
             .pipe(rename({basename: 'styles', suffix: '.min'}))
-            .pipe(gulp.dest('build'));
+            .pipe(gulp.dest('build/popup'));
     });
 
     gulp.task('minify', ['clean-build'], function () {
@@ -61,9 +61,9 @@
     });
 
     gulp.task('minify-popup-script', ['clean-build'], function () {
-        return gulp.src('src/popup.js')
+        return gulp.src('src/popup/popup.js')
             .pipe(uglify())
-            .pipe(gulp.dest('build'));
+            .pipe(gulp.dest('build/popup'));
     });
 
     gulp.task('modify-manifest', ['clean-build'], function () {
@@ -77,9 +77,9 @@
     });
 
     gulp.task('copy-html', ['clean-build'], function () {
-        return gulp.src('src/*.html')
-            .pipe(htmlreplace({js: ['olx-relister.min.js', 'popup.js'], css: 'styles.min.css'}))
-            .pipe(gulp.dest('build'));
+        return gulp.src('src/popup/*.html')
+            .pipe(htmlreplace({js: ['../olx-relister.min.js', 'popup.js'], css: 'styles.min.css'}))
+            .pipe(gulp.dest('build/popup'));
     });
 
     gulp.task('copy-images', ['clean-build'], function () {

@@ -36,8 +36,8 @@
             markAsReadEl.checked = settings.markAsRead;
             removeFromInboxEl.checked = settings.removeFromInbox;
         }).fail(function (e) {
-                console.error('Failed to load settings', e);
-            });
+            console.error('Failed to load settings', e);
+        });
     }
 
     function save() {

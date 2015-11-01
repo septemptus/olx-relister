@@ -6,7 +6,13 @@ module.exports = function (config) {
         basePath: '.',
         frameworks: ['jasmine'],
         browsers: ['PhantomJS'],
-        files: ['**/*-spec.js'],
+        files: [
+            'mock/chrome-mock.js',
+            '../src/lib/moment.min.js',
+            '../src/lib/q.min.js',
+            '../src/*.js',
+            '**/*-spec.js'
+        ],
         reporters: ['spec']
     });
 };
