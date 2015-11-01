@@ -10,6 +10,6 @@ TODO
 - Add error indication
 - Add interval timer
 - Chrome notifications
-- Block multiple cycles
+- ~~Block multiple cycles~~
 - Implicit setting saving
 - ~~Add automatic commits for releases (gulp-git)~~
