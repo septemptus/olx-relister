@@ -7,9 +7,10 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
         browsers: ['PhantomJS'],
         files: [
-            'mock/chrome-mock.js',
+            '../node_modules/phantomjs-polyfill/bind-polyfill.js',
             '../src/lib/moment.min.js',
             '../src/lib/q.min.js',
+            'mock/*-mock.js',
             '../src/*.js',
             '**/*-spec.js'
         ],

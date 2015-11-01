@@ -1,6 +1,8 @@
-/* global chrome, api, console, msgParser, requester */
+/* global chrome, ApiWrapper, console, msgParser, requester */
 (function () {
     'use strict';
+
+    var api = new ApiWrapper();
 
     chrome.runtime.onMessage.addListener(function (message) {
         var messages;
