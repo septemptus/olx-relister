@@ -14,7 +14,9 @@
         jsonedit = require('gulp-json-editor'),
         jshint = require('gulp-jshint'),
         zip = require('gulp-zip'),
-        Server = require('karma').Server;
+        git = require('gulp-git'),
+        Server = require('karma').Server,
+        version;
 
     function getBumpType() {
         var args = process.argv;
@@ -91,15 +93,27 @@
 
     gulp.task('build', ['copy-lib', 'copy-assets', 'modify-manifest', 'styles', 'minify', 'minify-popup-script']);
 
-    gulp.task('release', ['clean-rel', 'build', 'bump-versions'], function () {
+    gulp.task('build-release', ['clean-rel', 'build', 'bump-versions'], function () {
         return gulp.src('build/**')
             .pipe(zip('olx-relister.zip'))
             .pipe(gulp.dest('rel'));
     });
 
+    gulp.task('release', ['build-release'], function () {
+        return gulp.src('.')
+            .pipe(git.add({args: '*'}))
+            .pipe(git.commit('Release ' + version))
+            .pipe(git.tag('v' + version, 'version bump'));
+    });
+
     gulp.task('bump-package-ver', ['clean-rel', 'build'], function () {
         return gulp.src('./package.json')
             .pipe(bump({type: getBumpType()}))
+            .pipe(jsonedit(function (json) {
+                version = json.version;
+
+                return json;
+            }))
             .pipe(gulp.dest('.'));
     });
 
