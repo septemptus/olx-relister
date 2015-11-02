@@ -4,7 +4,7 @@
 
     var DEFAULT_OPTIONS = {
             type: 'basic',
-            iconUrl: 'img/ico.png'
+            iconUrl: 'img/ico120.png'
         },
         lastNID;
 

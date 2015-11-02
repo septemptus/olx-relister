@@ -9,7 +9,7 @@ TODO
 - ~~Move API requests out of the popup~~
 - Add error indication
 - Add interval timer
-- Chrome notifications
+- ~~Chrome notifications~~
 - ~~Block multiple cycles~~
 - Implicit setting saving
 - ~~Add automatic commits for releases (gulp-git)~~

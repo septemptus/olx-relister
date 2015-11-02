@@ -1,4 +1,4 @@
-/* global chrome, ApiWrapper, console, msgParser, requester */
+/* global chrome, ApiWrapper, console, msgParser, requester, notificator */
 (function () {
     'use strict';
 
@@ -39,11 +39,13 @@
                 .then(function () {
                     cycleInProgress = false;
                     console.log('Task successful!');
+                    notificator.notifySuccess();
                     chrome.runtime.sendMessage('olx.cycle-end');
                 })
                 .fail(function (e) {
                     cycleInProgress = false;
                     console.error('Flow broken', e);
+                    notificator.notifyError(e);
                     chrome.runtime.sendMessage('olx.cycle-failed');
                 });
         }

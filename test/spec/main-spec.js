@@ -1,10 +1,11 @@
-/* global chrome, Q, ApiWrapper, msgParser, requester */
+/* global chrome, Q, ApiWrapper, msgParser, requester, notificator */
 (function () {
     'use strict';
 
     var realApiWrapper = ApiWrapper,
         realMsgParser = msgParser,
         realRequester = requester,
+        realNotificator = notificator,
         msgParserMock = {
             getLinks: function () {
                 return returnPromise(getLinksSpy);
@@ -14,6 +15,10 @@
             request: function () {
                 return returnPromise(requestSpy);
             }
+        },
+        notificatorMock = {
+            notifySuccess: jasmine.createSpy(),
+            notifyError: jasmine.createSpy()
         },
         getMessagesSpy,
         switchLabelsSpy,
@@ -48,12 +53,14 @@
         window.ApiWrapper = ApiWrapperMock;
         window.msgParser = msgParserMock;
         window.requester = requesterMock;
+        window.notificator = notificatorMock;
     }
 
     function resetMocks() {
         window.ApiWrapper = realApiWrapper;
         window.msgParser = realMsgParser;
         window.requester = realRequester;
+        window.notificator = realNotificator;
     }
 
     function resetSpies() {
@@ -61,6 +68,8 @@
         getMessagesSpy.calls.reset();
         switchLabelsSpy.calls.reset();
         requestSpy.calls.reset();
+        notificatorMock.notifySuccess.calls.reset();
+        notificatorMock.notifyError.calls.reset();
     }
 
     describe('main', function () {
@@ -144,6 +153,28 @@
                     chrome.runtime.onMessage.removeLastListener();
                     done();
                 });
+            });
+        });
+
+        it('should show a notification after a successful cycle', function (done) {
+            chrome.runtime.sendMessage('olx.run');
+
+            chrome.runtime.onMessage.addListener(function () {
+                expect(notificatorMock.notifySuccess).toHaveBeenCalled();
+                chrome.runtime.onMessage.removeLastListener();
+                done();
+            });
+        });
+
+        it('should show a notification after a failed cycle', function (done) {
+            getMessagesSpy = jasmine.createSpy().and.returnValue(false);
+
+            chrome.runtime.sendMessage('olx.run');
+
+            chrome.runtime.onMessage.addListener(function () {
+                expect(notificatorMock.notifyError).toHaveBeenCalled();
+                chrome.runtime.onMessage.removeLastListener();
+                done();
             });
         });
     });
