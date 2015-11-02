@@ -1,4 +1,4 @@
-/* global chrome, Q, ApiWrapper, msgParser, requester, notificator */
+/* global chrome, Q, ApiWrapper, msgParser, requester, notificator, settings */
 (function () {
     'use strict';
 
@@ -173,6 +173,18 @@
 
             chrome.runtime.onMessage.addListener(function () {
                 expect(notificatorMock.notifyError).toHaveBeenCalled();
+                chrome.runtime.onMessage.removeLastListener();
+                done();
+            });
+        });
+
+        it('should log a last success timestamp', function (done) {
+            var spy = spyOn(settings, 'save').and.returnValue(Q.when());
+
+            chrome.runtime.sendMessage('olx.run');
+
+            chrome.runtime.onMessage.addListener(function () {
+                expect(spy).toHaveBeenCalled();
                 chrome.runtime.onMessage.removeLastListener();
                 done();
             });

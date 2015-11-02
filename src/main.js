@@ -1,4 +1,4 @@
-/* global chrome, ApiWrapper, console, msgParser, requester, notificator */
+/* global chrome, ApiWrapper, console, msgParser, requester, notificator, settings */
 (function () {
     'use strict';
 
@@ -20,6 +20,12 @@
             return api.switchLabels(messages);
         }
 
+        function logLastSuccess() {
+            return settings.save({
+                lastSuccess: Date.now()
+            });
+        }
+
         if (message === 'olx.run') {
             if (cycleInProgress) {
                 console.warn('Cycle not started, one is already in progress');
@@ -36,6 +42,7 @@
                 .then(msgParser.getLinks)
                 .then(requester.request)
                 .then(switchLabels)
+                .then(logLastSuccess)
                 .then(function () {
                     cycleInProgress = false;
                     console.log('Task successful!');
