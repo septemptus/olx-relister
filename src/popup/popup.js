@@ -7,10 +7,7 @@
         labelToEl,
         markAsReadEl,
         removeFromInboxEl,
-        saveButtonEl,
         forceButtonEl,
-        fromContainerEl,
-        toContainerEl,
         lastSuccessEl,
         nextCheckEl;
 
@@ -37,22 +34,14 @@
     function save() {
         var setting = {};
 
-        fromContainerEl.classList.remove('has-error');
-        toContainerEl.classList.remove('has-error');
-
         setting[labelFromEl.name] = labelFromEl.value || null;
         setting[labelToEl.name] = labelToEl.value || null;
         setting[markAsReadEl.name] = markAsReadEl.checked;
         setting[removeFromInboxEl.name] = removeFromInboxEl.checked;
 
         settings.save(setting)
-            .then(function () {
-                flash('success');
-            })
             .fail(function () {
                 flash('error');
-                fromContainerEl.classList.add('has-error');
-                toContainerEl.classList.add('has-error');
             });
     }
 
@@ -61,19 +50,20 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        fromContainerEl = document.querySelector('#from-container');
-        toContainerEl = document.querySelector('#to-container');
         labelFromEl = document.querySelector('[name=labelFrom]');
         labelToEl = document.querySelector('[name=labelTo]');
         markAsReadEl = document.querySelector('[name=markAsRead]');
         removeFromInboxEl = document.querySelector('[name=removeFromInbox]');
-        saveButtonEl = document.querySelector('[name=save]');
         forceButtonEl = document.querySelector('[name=force]');
         lastSuccessEl = document.querySelector('#last-success');
         nextCheckEl = document.querySelector('#next-check');
 
-        saveButtonEl.addEventListener('click', save);
         forceButtonEl.addEventListener('click', sendEvent);
+
+        labelFromEl.addEventListener('input', save);
+        labelToEl.addEventListener('input', save);
+        markAsReadEl.addEventListener('click', save);
+        removeFromInboxEl.addEventListener('click', save);
     });
 
     chrome.runtime.onMessage.addListener(function (message) {

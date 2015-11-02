@@ -11,7 +11,7 @@ TODO
 - Add interval timer
 - ~~Chrome notifications~~
 - ~~Block multiple cycles~~
-- Implicit setting saving
+- ~~Implicit setting saving~~
 - ~~Add automatic commits for releases (gulp-git)~~
 - ~~Fix an issue with bad label format being sent with the modify call~~
 - ~~Send requests in sequence~~
