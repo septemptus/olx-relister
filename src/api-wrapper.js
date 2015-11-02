@@ -177,7 +177,7 @@
             gapi.client.gmail.users.messages.modify({
                 userId: 'me',
                 id: message.id,
-                addLabelIds: settings.labelTo && [labelMap[settings.labelTo]],
+                addLabelIds: (settings.labelTo && [labelMap[settings.labelTo]]) || [],
                 removeLabelIds: labelsToRemove
             }).then(deferred.resolve, deferred.reject);
 
