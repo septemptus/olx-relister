@@ -7,7 +7,7 @@ TODO
 ----
 - Add log storage (with copy to clipboard)
 - ~~Move API requests out of the popup~~
-- Add error indication
+- ~~Add error indication~~
 - Add interval timer
 - ~~Chrome notifications~~
 - ~~Block multiple cycles~~

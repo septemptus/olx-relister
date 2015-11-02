@@ -32,3 +32,7 @@ input[type=checkbox] {
     background-color: #cf0433;
 }
 
+#last-success, #next-check {
+    float: right;
+}
+

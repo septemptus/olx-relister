@@ -1,15 +1,18 @@
-/* global settings, api, console, chrome */
+/* global settings, api, console, chrome, moment */
 (function () {
     'use strict';
 
-    var labelFromEl,
+    var DATE_FORMAT = 'DD.MM.YYYY HH:mm',
+        labelFromEl,
         labelToEl,
         markAsReadEl,
         removeFromInboxEl,
         saveButtonEl,
         forceButtonEl,
         fromContainerEl,
-        toContainerEl;
+        toContainerEl,
+        lastSuccessEl,
+        nextCheckEl;
 
     function flash(className) {
         document.body.classList.add(className);
@@ -25,6 +28,7 @@
             labelToEl.value = settings.labelTo;
             markAsReadEl.checked = settings.markAsRead;
             removeFromInboxEl.checked = settings.removeFromInbox;
+            lastSuccessEl.innerHTML = settings.lastSuccess ? moment(settings.lastSuccess).format(DATE_FORMAT) : '-';
         }).fail(function (e) {
             console.error('Failed to load settings', e);
         });
@@ -65,6 +69,8 @@
         removeFromInboxEl = document.querySelector('[name=removeFromInbox]');
         saveButtonEl = document.querySelector('[name=save]');
         forceButtonEl = document.querySelector('[name=force]');
+        lastSuccessEl = document.querySelector('#last-success');
+        nextCheckEl = document.querySelector('#next-check');
 
         saveButtonEl.addEventListener('click', save);
         forceButtonEl.addEventListener('click', sendEvent);
@@ -72,6 +78,7 @@
 
     chrome.runtime.onMessage.addListener(function (message) {
         if (message === 'olx.cycle-end') {
+            lastSuccessEl.innerHTML = moment().format(DATE_FORMAT);
             flash('success');
         }
 
