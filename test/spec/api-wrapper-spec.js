@@ -309,7 +309,7 @@
                 it('should not include target label', function (done) {
                     api.switchLabels([{id: 1, msg: ''}])
                         .then(function () {
-                            expect(spy.calls.first().args[0].addLabelIds).toBeNull();
+                            expect(spy.calls.first().args[0].addLabelIds).toEqual([]);
                             done();
                         });
                 });
@@ -360,7 +360,7 @@
                 it('should not include source label', function (done) {
                     api.switchLabels([{id: 1, msg: ''}])
                         .then(function () {
-                            expect(spy.calls.first().args[0].removeLabelIds.length).toBe(0);
+                            expect(spy.calls.first().args[0].removeLabelIds).toEqual([]);
                             done();
                         });
                 });
