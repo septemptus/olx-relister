@@ -2,13 +2,17 @@
 (function () {
     "use strict";
     function request(urls) {
-        var promises = [];
-
         console.log('Sending requests');
 
-        urls.forEach(function (url) {
+        function startNextRequest(urls) {
             var xhr = new XMLHttpRequest(),
-                xhrDeferred = Q.defer();
+                xhrDeferred = Q.defer(),
+                url = urls[0];
+
+            if (!url) {
+                xhrDeferred.resolve();
+                return xhrDeferred.promise;
+            }
 
             console.log('Sending request for', url);
 
@@ -22,11 +26,17 @@
                     xhrDeferred.reject();
                 }
             };
-            promises.push(xhrDeferred.promise);
             xhr.send();
-        });
 
-        return Q.all(promises);
+            return xhrDeferred.promise.then(startNextRequest.bind(null, urls.slice(1)));
+        }
+
+        if (urls && urls.length) {
+            return startNextRequest(urls);
+        }
+
+        console.log('No requests sent');
+        return Q.when();
     }
 
     window.requester = {
