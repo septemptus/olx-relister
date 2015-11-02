@@ -1,4 +1,3 @@
-/* global msgParser */
 (function () {
     'use strict';
 
