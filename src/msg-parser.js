@@ -10,6 +10,11 @@
 
         console.log('Procuring links');
 
+        if (!messages) {
+            deferred.resolve([]);
+            return deferred.promise;
+        }
+
         messages.forEach(function (message) {
             var linkMatches = linkRegExp.exec(message.msg),
                 link = linkMatches && linkMatches[0];
