@@ -189,5 +189,25 @@
                 done();
             });
         });
+
+        it('should copy logs on an olx.copy-logs message', function () {
+            var spy = spyOn(document, 'execCommand');
+
+            document.addEventListener('copy', spy);
+
+            chrome.runtime.sendMessage('olx.copy-logs');
+
+            expect(spy).toHaveBeenCalledWith('copy');
+        });
+
+        it('should send an olx.logs-copied message after copying logs', function (done) {
+            chrome.runtime.onMessage.addListener(function (msg) {
+                expect(msg).toBe('olx.logs-copied');
+                chrome.runtime.onMessage.removeLastListener();
+                done();
+            });
+
+            chrome.runtime.sendMessage('olx.copy-logs');
+        });
     });
 }());

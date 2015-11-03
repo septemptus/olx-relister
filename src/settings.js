@@ -1,4 +1,4 @@
-/* global console, Q, chrome */
+/* global logStore, Q, chrome */
 (function () {
     'use strict';
 
@@ -14,9 +14,9 @@
     function save(setting) {
         var deferred = Q.defer();
 
-        console.log('Saving settings', setting);
+        logStore.log('Saving settings', setting);
         chrome.storage.sync.set(setting, function () {
-            console.log('Settings saved');
+            logStore.log('Settings saved');
             deferred.resolve();
         });
 
@@ -26,7 +26,7 @@
     function load() {
         var deferred = Q.defer();
 
-        console.log('Loading settings');
+        logStore.log('Loading settings');
 
         chrome.storage.sync.get(DEFAULTS, deferred.resolve);
 

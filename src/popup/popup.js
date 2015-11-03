@@ -1,4 +1,4 @@
-/* global settings, api, console, chrome, moment */
+/* global settings, chrome, moment, logStore */
 (function () {
     'use strict';
 
@@ -8,6 +8,7 @@
         markAsReadEl,
         removeFromInboxEl,
         forceButtonEl,
+        copyButtonEl,
         lastSuccessEl,
         nextCheckEl;
 
@@ -27,7 +28,7 @@
             removeFromInboxEl.checked = settings.removeFromInbox;
             lastSuccessEl.innerHTML = settings.lastSuccess ? moment(settings.lastSuccess).format(DATE_FORMAT) : '-';
         }).fail(function (e) {
-            console.error('Failed to load settings', e);
+            logStore.error('Failed to load settings', e);
         });
     }
 
@@ -49,6 +50,10 @@
         chrome.runtime.sendMessage('olx.run');
     }
 
+    function copyLogs() {
+        chrome.runtime.sendMessage('olx.copy-logs');
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         labelFromEl = document.querySelector('[name=labelFrom]');
         labelToEl = document.querySelector('[name=labelTo]');
@@ -57,8 +62,10 @@
         forceButtonEl = document.querySelector('[name=force]');
         lastSuccessEl = document.querySelector('#last-success');
         nextCheckEl = document.querySelector('#next-check');
+        copyButtonEl = document.querySelector('[name=logs]');
 
         forceButtonEl.addEventListener('click', sendEvent);
+        copyButtonEl.addEventListener('click', copyLogs);
 
         labelFromEl.addEventListener('input', save);
         labelToEl.addEventListener('input', save);
@@ -69,6 +76,10 @@
     chrome.runtime.onMessage.addListener(function (message) {
         if (message === 'olx.cycle-end') {
             lastSuccessEl.innerHTML = moment().format(DATE_FORMAT);
+            flash('success');
+        }
+
+        if (message === 'olx.logs-copied') {
             flash('success');
         }
 

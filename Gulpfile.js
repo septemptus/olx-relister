@@ -139,7 +139,7 @@
     });
 
     gulp.task('lint', function () {
-        return gulp.src(['./src/*.js', './test/**/*.js'])
+        return gulp.src(['./src/*.js', './src/popup.js', './test/**/*.js'])
             .pipe(jshint())
             .pipe(jshint.reporter('jshint-stylish'))
             .pipe(jshint.reporter('fail'));

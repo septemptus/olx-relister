@@ -16,6 +16,7 @@
             "lib/moment.min.js",
             "lib/q.min.js",
             "lib/gapi.js",
+            "log-store.js",
             "settings.js",
             "notificator.js",
             "requester.js",

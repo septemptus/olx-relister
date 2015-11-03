@@ -1,4 +1,4 @@
-/* global console, Q, moment, gapi, settings */
+/* global logStore, Q, moment, gapi, settings */
 (function () {
     'use strict';
 
@@ -13,10 +13,10 @@
         function authorize(immediate) {
             var deferred = Q.defer();
 
-            console.log('Authorizing ...');
+            logStore.log('Authorizing ...');
 
             if (authorizationExpiryTime && authorizationExpiryTime.isAfter(moment())) {
-                console.log('Authorization token still valid, skipping');
+                logStore.log('Authorization token still valid, skipping');
                 return Q.when();
             }
 
@@ -26,27 +26,27 @@
                 scope: scope
             }, function (response) {
                 if (response.error === 'immediate_failed') {
-                    console.log('Privileges not set, prompting');
+                    logStore.log('Privileges not set, prompting');
                     authorize(false)
                         .then(function (response) {
-                            console.log('Authorization successful');
+                            logStore.log('Authorization successful');
                             authorizationExpiryTime = moment(Number(response.expires_at) * 1000);
                             deferred.resolve(response);
                         })
                         .fail(function () {
-                            console.error('Authorization error (with prompt)');
+                            logStore.error('Authorization error (with prompt)');
                             deferred.reject('Non-immediate authorization failed');
                         });
                     return;
                 }
 
                 if (response.error) {
-                    console.error('Authorization error');
+                    logStore.error('Authorization error');
                     deferred.reject('Immediate authorization failed');
                     return;
                 }
 
-                console.log('Authorization successful');
+                logStore.log('Authorization successful');
                 authorizationExpiryTime = moment(Number(response.expires_at) * 1000);
                 deferred.resolve(response);
             });
@@ -61,7 +61,7 @@
                 return Q.when();
             }
 
-            console.log('Loading GMail API');
+            logStore.log('Loading GMail API');
 
             gapi.client.load('gmail', 'v1').then(deferred.resolve, deferred.reject);
 
@@ -89,7 +89,7 @@
                     listParameters.labelIds = labelMap[settings.labelFrom];
                 }
 
-                console.log('Loading messages');
+                logStore.log('Loading messages');
 
                 gapi.client.gmail.users.messages.list(listParameters).then(deferred.resolve, deferred.reject);
 
@@ -99,31 +99,31 @@
 
         function parseMessages(response) {
             if (response.result && !response.result.messages) {
-                console.log('No messages to parse');
+                logStore.log('No messages to parse');
                 return Q.reject('No messages received');
             }
 
             return Q.all(response.result.messages.map(function (messageResponse) {
                 var messageDeferred = Q.defer();
 
-                console.log('Loading message');
+                logStore.log('Loading message');
 
                 gapi.client.gmail.users.messages.get({ id: messageResponse.id, format: 'raw', userId: 'me' })
                     .then(function (message) {
-                        console.log('Parsing message');
+                        logStore.log('Parsing message');
                         messageDeferred.resolve({ id: messageResponse.id, msg: parseMessage(message) });
                     }, messageDeferred.reject);
 
                 return messageDeferred.promise;
             })).then(function (messages) {
-                console.log('All messages parsed');
+                logStore.log('All messages parsed');
 
                 return messages;
             });
         }
 
         function switchLabels(messages) {
-            console.log('Switching labels');
+            logStore.log('Switching labels');
 
             return loadGmailApi()
                 .then(authorize.bind(null, true))
@@ -136,11 +136,11 @@
                 .then(function (settings) {
                     return Q.all(messages.map(function (message) {
                         return switchLabel(message, settings).then(function () {
-                            console.log('Label switching successful');
+                            logStore.log('Label switching successful');
                         });
                     }));
                 }).then(function () {
-                    console.log('All labels switched');
+                    logStore.log('All labels switched');
                 });
         }
 
@@ -155,7 +155,7 @@
                 labelsToRemove = [];
 
             if (!settings.labelFrom && !settings.labelTo && !settings.markAsRead && !settings.removeFromInbox) {
-                console.log('No labels to switch');
+                logStore.log('No labels to switch');
 
                 return Q.when();
             }
@@ -172,7 +172,7 @@
                 labelsToRemove.push(INBOX_LABEL);
             }
 
-            console.log('Switching labels, adding', labelMap[settings.labelTo], ', removing', labelsToRemove);
+            logStore.log('Switching labels, adding', labelMap[settings.labelTo], ', removing', labelsToRemove);
 
             gapi.client.gmail.users.messages.modify({
                 userId: 'me',
@@ -187,7 +187,7 @@
         function getLabels() {
             var deferred = Q.defer();
 
-            console.log('Getting labels');
+            logStore.log('Getting labels');
 
             gapi.client.gmail.users.labels.list({ userId: 'me' }).then(function (response) {
                 var map = {};

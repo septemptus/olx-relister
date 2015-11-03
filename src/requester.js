@@ -1,8 +1,8 @@
-/* global console, Q */
+/* global logStore, Q */
 (function () {
     "use strict";
     function request(urls) {
-        console.log('Sending requests');
+        logStore.log('Sending requests');
 
         function startNextRequest(urls) {
             var xhr = new XMLHttpRequest(),
@@ -14,15 +14,15 @@
                 return xhrDeferred.promise;
             }
 
-            console.log('Sending request for', url);
+            logStore.log('Sending request for', url);
 
             xhr.open('GET', url);
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    console.log('Request for', url, 'was successful');
+                    logStore.log('Request for', url, 'was successful');
                     xhrDeferred.resolve();
                 } else if (xhr.readyState === 4 && xhr.status !== 200) {
-                    console.log('Request for', url, 'failed');
+                    logStore.log('Request for', url, 'failed');
                     xhrDeferred.reject();
                 }
             };
@@ -35,7 +35,7 @@
             return startNextRequest(urls);
         }
 
-        console.log('No requests sent');
+        logStore.log('No requests sent');
         return Q.when();
     }
 

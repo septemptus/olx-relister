@@ -1,4 +1,4 @@
-/* global Q, console */
+/* global Q, logStore */
 (function () {
     'use strict';
 
@@ -8,7 +8,7 @@
         var deferred = Q.defer(),
             links = [];
 
-        console.log('Procuring links');
+        logStore.log('Procuring links');
 
         if (!messages) {
             deferred.resolve([]);
@@ -25,10 +25,10 @@
         });
 
         if (links.length === messages.length) {
-            console.log('Links found:', links);
+            logStore.log('Links found:', links);
             deferred.resolve(links);
         } else {
-            console.error('Some messages did not contain links');
+            logStore.error('Some messages did not contain links');
             deferred.reject('Some messages did not contain links');
         }
 

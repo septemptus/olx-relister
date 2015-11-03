@@ -1,4 +1,4 @@
-/* global chrome, ApiWrapper, console, msgParser, requester, notificator, settings */
+/* global chrome, ApiWrapper, logStore, msgParser, requester, notificator, settings */
 (function () {
     'use strict';
 
@@ -26,16 +26,28 @@
             });
         }
 
+        if (message === 'olx.copy-logs') {
+            document.oncopy = function (event) {
+                event.clipboardData.setData('text', logStore.get());
+                event.preventDefault();
+            };
+
+            document.execCommand('copy');
+            document.oncopy = null;
+            chrome.runtime.sendMessage('olx.logs-copied');
+            return;
+        }
+
         if (message === 'olx.run') {
             if (cycleInProgress) {
-                console.warn('Cycle not started, one is already in progress');
+                logStore.error('Cycle not started, one is already in progress');
                 chrome.runtime.sendMessage('olx.cycle-in-progress');
                 return;
             }
 
             cycleInProgress = true;
 
-            console.log('Starting process');
+            logStore.log('Starting process');
 
             api.getMessages()
                 .then(storeMessages)
@@ -45,13 +57,13 @@
                 .then(logLastSuccess)
                 .then(function () {
                     cycleInProgress = false;
-                    console.log('Task successful!');
+                    logStore.log('Task successful!');
                     notificator.notifySuccess();
                     chrome.runtime.sendMessage('olx.cycle-end');
                 })
                 .fail(function (e) {
                     cycleInProgress = false;
-                    console.error('Flow broken', e);
+                    logStore.error('Flow broken', e);
                     notificator.notifyError(e);
                     chrome.runtime.sendMessage('olx.cycle-failed');
                 });
