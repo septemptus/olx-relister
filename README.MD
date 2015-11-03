@@ -5,7 +5,7 @@ Chrome extension using GMail API to filter messages from OLX portal and to autom
 
 TODO
 ----
-- Add log storage (with copy to clipboard)
+- ~~Add log storage (with copy to clipboard)~~
 - ~~Move API requests out of the popup~~
 - ~~Add error indication~~
 - Add interval timer
