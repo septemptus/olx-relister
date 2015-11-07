@@ -90,5 +90,5 @@
         }
     });
 
-    timerManager.create();
+    //timerManager.create();
 }());
