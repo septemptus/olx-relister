@@ -132,6 +132,11 @@
     gulp.task('bump-versions', ['build', 'bump-package-ver', 'bump-manifest-ver', 'bump-dist-manifest-ver']);
 
     gulp.task('test', function (done) {
+        if (process.argv.indexOf('--force') !== -1) {
+            done();
+            return;
+        }
+
         new Server({
             configFile: process.cwd() + '\\test\\karma.conf.js',
             singleRun: true
@@ -139,6 +144,10 @@
     });
 
     gulp.task('lint', function () {
+        if (process.argv.indexOf('--force') !== -1) {
+            return;
+        }
+
         return gulp.src(['./src/*.js', './src/popup.js', './test/**/*.js'])
             .pipe(jshint())
             .pipe(jshint.reporter('jshint-stylish'))

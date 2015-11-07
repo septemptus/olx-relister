@@ -46,7 +46,7 @@
             .then(requester.request)
             .then(switchLabels)
             .then(logLastSuccess)
-            .then(setNewTimer)
+            //.then(setNewTimer)
             .then(function () {
                 cycleInProgress = false;
                 logStore.log('Task successful!');
@@ -57,7 +57,7 @@
                 cycleInProgress = false;
                 logStore.error('Flow broken', e);
                 notificator.notifyError(e);
-                setNewTimer();
+                //setNewTimer();
                 chrome.runtime.sendMessage('olx.cycle-failed');
             });
     }
@@ -73,11 +73,11 @@
         chrome.runtime.sendMessage('olx.logs-copied');
     }
 
-    chrome.alarms.onAlarm.addListener(function (alarm) {
-        if (alarm.name === 'olx.timer') {
-            runCycle();
-        }
-    });
+    //chrome.alarms.onAlarm.addListener(function (alarm) {
+    //    if (alarm.name === 'olx.timer') {
+    //        runCycle();
+    //    }
+    //});
 
     chrome.runtime.onMessage.addListener(function (message) {
         if (message === 'olx.copy-logs') {
