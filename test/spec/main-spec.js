@@ -1,4 +1,4 @@
-/* global chrome, Q, ApiWrapper, msgParser, requester, notificator, settings */
+/* global chrome, Q, ApiWrapper, msgParser, requester, notificator, settings, timerManager */
 (function () {
     'use strict';
 
@@ -72,121 +72,274 @@
         notificatorMock.notifyError.calls.reset();
     }
 
+    function clearListeners() {
+        chrome.runtime.onMessage.clearListeners();
+        chrome.alarms.onAlarm.clearListeners();
+    }
+
     describe('main', function () {
         beforeEach(setMocks);
         beforeEach(resetSpies);
         afterEach(resetMocks);
+        afterEach(clearListeners);
 
-        it('should start the cycle on "olx.run" message', function (done) {
-            chrome.runtime.sendMessage('olx.run');
-            chrome.runtime.onMessage.addListener(function () {
-                expect(getMessagesSpy).toHaveBeenCalled();
-                chrome.runtime.onMessage.removeLastListener();
-                done();
-            });
-        });
-
-        it('should not start the cycle given a different message than "olx.run"', function () {
-            chrome.runtime.sendMessage('olx.runxx');
-            expect(getMessagesSpy).not.toHaveBeenCalled();
-        });
-
-        it('should emit an "olx.cycle-end" message on success', function (done) {
-            chrome.runtime.sendMessage('olx.run');
-            chrome.runtime.onMessage.addListener(function (message) {
-                expect(message).toBe('olx.cycle-end');
-                chrome.runtime.onMessage.removeLastListener();
-                done();
-            });
-        });
-
-        it('should emit an "olx.cycle-failed" message on error', function (done) {
-            getMessagesSpy = jasmine.createSpy().and.returnValue(false);
-
-            chrome.runtime.sendMessage('olx.run');
-            chrome.runtime.onMessage.addListener(function (message) {
-                expect(message).toBe('olx.cycle-failed');
-                chrome.runtime.onMessage.removeLastListener();
-                done();
-            });
-        });
-
-        it('should not allow concurrent cycles to run in the same time', function (done) {
-            var messages = [];
-
-            chrome.runtime.sendMessage('olx.run');
-            chrome.runtime.onMessage.addListener(function (message) {
-                messages.push(message);
-                if (messages.length === 3) {
-                    expect(messages[0]).toBe('olx.cycle-in-progress');
-                    chrome.runtime.onMessage.removeLastListener();
+        describe('given we start the cycle using a force message', function () {
+            it('should start the cycle on "olx.run" message', function (done) {
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(getMessagesSpy).toHaveBeenCalled();
                     done();
-                }
+                });
+                chrome.runtime.sendMessage('olx.run');
             });
-            chrome.runtime.sendMessage('olx.run');
-        });
 
-        it('should deflag concurrent cycle lock after a successful cycle', function (done) {
-            chrome.runtime.sendMessage('olx.run');
-            chrome.runtime.onMessage.addListener(function (message) {
-                expect(message).toBe('olx.cycle-end');
-                chrome.runtime.onMessage.removeLastListener();
+            it('should not start the cycle given a different message than "olx.run"', function () {
+                expect(getMessagesSpy).not.toHaveBeenCalled();
+                chrome.runtime.sendMessage('olx.runxx');
+            });
+
+            it('should emit an "olx.cycle-end" message on success', function (done) {
                 chrome.runtime.sendMessage('olx.run');
                 chrome.runtime.onMessage.addListener(function (message) {
                     expect(message).toBe('olx.cycle-end');
-                    chrome.runtime.onMessage.removeLastListener();
                     done();
                 });
             });
-        });
 
-        it('should deflag concurrent cycle lock after a failed cycle', function (done) {
-            getMessagesSpy = jasmine.createSpy().and.returnValue(false);
+            it('should emit an "olx.cycle-failed" message on error', function (done) {
+                getMessagesSpy = jasmine.createSpy().and.returnValue(false);
 
-            chrome.runtime.sendMessage('olx.run');
-            chrome.runtime.onMessage.addListener(function (message) {
-                expect(message).toBe('olx.cycle-failed');
-                chrome.runtime.onMessage.removeLastListener();
                 chrome.runtime.sendMessage('olx.run');
                 chrome.runtime.onMessage.addListener(function (message) {
                     expect(message).toBe('olx.cycle-failed');
-                    chrome.runtime.onMessage.removeLastListener();
+                    done();
+                });
+            });
+
+            it('should not allow concurrent cycles to run in the same time', function (done) {
+                var messages = [];
+
+                chrome.runtime.sendMessage('olx.run');
+                chrome.runtime.onMessage.addListener(function (message) {
+                    messages.push(message);
+                    if (messages.length === 3) {
+                        expect(messages[0]).toBe('olx.cycle-in-progress');
+                        done();
+                    }
+                });
+
+                chrome.runtime.sendMessage('olx.run');
+            });
+
+            it('should deflag concurrent cycle lock after a successful cycle', function (done) {
+                chrome.runtime.sendMessage('olx.run');
+
+                chrome.runtime.onMessage.addListener(function (message) {
+                    expect(message).toBe('olx.cycle-end');
+                    chrome.runtime.onMessage.clearListeners();
+                    chrome.runtime.sendMessage('olx.run');
+                    chrome.runtime.onMessage.addListener(function (message) {
+                        expect(message).toBe('olx.cycle-end');
+                        done();
+                    });
+                });
+            });
+
+            it('should deflag concurrent cycle lock after a failed cycle', function (done) {
+                getMessagesSpy = jasmine.createSpy().and.returnValue(false);
+
+                chrome.runtime.sendMessage('olx.run');
+                chrome.runtime.onMessage.addListener(function (message) {
+                    expect(message).toBe('olx.cycle-failed');
+                    chrome.runtime.onMessage.clearListeners();
+                    chrome.runtime.sendMessage('olx.run');
+                    chrome.runtime.onMessage.addListener(function (message) {
+                        expect(message).toBe('olx.cycle-failed');
+                        done();
+                    });
+                });
+            });
+
+            it('should show a notification after a successful cycle', function (done) {
+                chrome.runtime.sendMessage('olx.run');
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(notificatorMock.notifySuccess).toHaveBeenCalled();
+                    done();
+                });
+            });
+
+            it('should show a notification after a failed cycle', function (done) {
+                getMessagesSpy = jasmine.createSpy().and.returnValue(false);
+
+                chrome.runtime.sendMessage('olx.run');
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(notificatorMock.notifyError).toHaveBeenCalled();
+                    done();
+                });
+            });
+
+            it('should log a last success timestamp', function (done) {
+                var spy = spyOn(settings, 'save').and.returnValue(Q.when());
+
+                chrome.runtime.sendMessage('olx.run');
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(spy).toHaveBeenCalled();
+                    done();
+                });
+            });
+
+            it('should start a new timer given a success', function (done) {
+                var spy = spyOn(timerManager, 'create');
+
+                chrome.runtime.sendMessage('olx.run');
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(spy).toHaveBeenCalled();
+                    done();
+                });
+            });
+
+            it('should start a new timer given a failure', function (done) {
+                var spy = spyOn(timerManager, 'create');
+
+                getMessagesSpy = jasmine.createSpy().and.returnValue(false);
+
+                chrome.runtime.sendMessage('olx.run');
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(spy).toHaveBeenCalled();
                     done();
                 });
             });
         });
 
-        it('should show a notification after a successful cycle', function (done) {
-            chrome.runtime.sendMessage('olx.run');
-
-            chrome.runtime.onMessage.addListener(function () {
-                expect(notificatorMock.notifySuccess).toHaveBeenCalled();
-                chrome.runtime.onMessage.removeLastListener();
-                done();
+        describe('given we start the cycle using the timer', function () {
+            it('should start the cycle on olx.timer timer message', function (done) {
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(getMessagesSpy).toHaveBeenCalled();
+                    done();
+                });
+                chrome.alarms.trigger();
             });
-        });
 
-        it('should show a notification after a failed cycle', function (done) {
-            getMessagesSpy = jasmine.createSpy().and.returnValue(false);
-
-            chrome.runtime.sendMessage('olx.run');
-
-            chrome.runtime.onMessage.addListener(function () {
-                expect(notificatorMock.notifyError).toHaveBeenCalled();
-                chrome.runtime.onMessage.removeLastListener();
-                done();
+            it('should not start the cycle on a timer message other than olx.timer', function (done) {
+                chrome.alarms.onAlarm.addListener(function () {
+                    expect(getMessagesSpy).not.toHaveBeenCalled();
+                    done();
+                });
+                chrome.alarms.trigger('olx.notimer');
             });
-        });
 
-        it('should log a last success timestamp', function (done) {
-            var spy = spyOn(settings, 'save').and.returnValue(Q.when());
+            it('should emit an "olx.cycle-end" message on success', function (done) {
+                chrome.runtime.onMessage.addListener(function (message) {
+                    expect(message).toBe('olx.cycle-end');
+                    done();
+                });
+                chrome.alarms.trigger();
+            });
 
-            chrome.runtime.sendMessage('olx.run');
+            it('should emit an "olx.cycle-failed" message on error', function (done) {
+                getMessagesSpy = jasmine.createSpy().and.returnValue(false);
 
-            chrome.runtime.onMessage.addListener(function () {
-                expect(spy).toHaveBeenCalled();
-                chrome.runtime.onMessage.removeLastListener();
-                done();
+                chrome.runtime.onMessage.addListener(function (message) {
+                    expect(message).toBe('olx.cycle-failed');
+                    done();
+                });
+                chrome.alarms.trigger();
+            });
+
+            it('should not allow concurrent cycles to run in the same time', function (done) {
+                var messages = [];
+
+                chrome.runtime.onMessage.addListener(function (message) {
+                    messages.push(message);
+                    if (messages.length === 2) {
+                        expect(messages[0]).toBe('olx.cycle-in-progress');
+                        done();
+                    }
+                });
+                chrome.alarms.trigger();
+                chrome.alarms.trigger();
+            });
+
+            it('should deflag concurrent cycle lock after a successful cycle', function (done) {
+                chrome.runtime.onMessage.addListener(function (message) {
+                    expect(message).toBe('olx.cycle-end');
+                    chrome.runtime.onMessage.clearListeners();
+                    chrome.alarms.trigger();
+                    chrome.runtime.onMessage.addListener(function (message) {
+                        expect(message).toBe('olx.cycle-end');
+                        done();
+                    });
+                });
+
+                chrome.alarms.trigger();
+            });
+
+            it('should deflag concurrent cycle lock after a failed cycle', function (done) {
+                getMessagesSpy = jasmine.createSpy().and.returnValue(false);
+
+                chrome.runtime.onMessage.addListener(function (message) {
+                    expect(message).toBe('olx.cycle-failed');
+                    chrome.runtime.onMessage.clearListeners();
+                    chrome.runtime.onMessage.addListener(function (message) {
+                        expect(message).toBe('olx.cycle-failed');
+                        done();
+                    });
+                    chrome.alarms.trigger();
+                });
+
+                chrome.alarms.trigger();
+            });
+
+            it('should show a notification after a successful cycle', function (done) {
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(notificatorMock.notifySuccess).toHaveBeenCalled();
+                    done();
+                });
+
+                chrome.alarms.trigger();
+            });
+
+            it('should show a notification after a failed cycle', function (done) {
+                getMessagesSpy = jasmine.createSpy().and.returnValue(false);
+
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(notificatorMock.notifyError).toHaveBeenCalled();
+                    done();
+                });
+
+                chrome.alarms.trigger();
+            });
+
+            it('should log a last success timestamp', function (done) {
+                var spy = spyOn(settings, 'save').and.returnValue(Q.when());
+
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(spy).toHaveBeenCalled();
+                    done();
+                });
+
+                chrome.alarms.trigger();
+            });
+
+            it('should start a new timer given a success', function (done) {
+                var spy = spyOn(timerManager, 'create');
+
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(spy).toHaveBeenCalled();
+                    done();
+                });
+                chrome.alarms.trigger();
+            });
+
+            it('should start a new timer given a failure', function (done) {
+                var spy = spyOn(timerManager, 'create');
+
+                getMessagesSpy = jasmine.createSpy().and.returnValue(false);
+
+                chrome.runtime.onMessage.addListener(function () {
+                    expect(spy).toHaveBeenCalled();
+                    done();
+                });
+                chrome.alarms.trigger();
             });
         });
 
@@ -203,7 +356,6 @@
         it('should send an olx.logs-copied message after copying logs', function (done) {
             chrome.runtime.onMessage.addListener(function (msg) {
                 expect(msg).toBe('olx.logs-copied');
-                chrome.runtime.onMessage.removeLastListener();
                 done();
             });
 

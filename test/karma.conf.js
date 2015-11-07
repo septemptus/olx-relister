@@ -11,7 +11,8 @@ module.exports = function (config) {
             '../src/lib/moment.min.js',
             '../src/lib/q.min.js',
             'mock/*-mock.js',
-            '../src/*.js',
+            '../src/!(main).js',
+            '../src/main.js',
             '**/*-spec.js'
         ],
         reporters: ['spec']

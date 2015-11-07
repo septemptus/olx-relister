@@ -18,6 +18,7 @@
             "lib/gapi.js",
             "log-store.js",
             "settings.js",
+            "timer-manager.js",
             "notificator.js",
             "requester.js",
             "msg-parser.js",
@@ -27,6 +28,7 @@
         "persistent": false
     },
     "permissions": [
+        "alarms",
         "storage",
         "identity",
         "notifications",

@@ -5,8 +5,9 @@
     var DEFAULTS = {
         labelFrom: null,
         labelTo: null,
-        interval: 24 * 60 * 60 * 1000,
+        interval: 3 * 60 * 60 * 1000,
         lastSuccess: null,
+        nextCheck: null,
         markAsRead: false,
         removeFromInbox: false
     };
