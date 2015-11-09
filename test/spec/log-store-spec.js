@@ -31,7 +31,7 @@
             it('should toss the oldest record if reached capacity', function () {
                 var secondRecord;
 
-                for (var i = 0; i < 200; i += 1) {
+                for (var i = 0; i < 500; i += 1) {
                     logStore.log(i);
                 }
 
@@ -75,7 +75,7 @@
             it('should toss the oldest record if reached capacity', function () {
                 var secondRecord;
 
-                for (var i = 0; i < 200; i += 1) {
+                for (var i = 0; i < 500; i += 1) {
                     logStore.error(i);
                 }
 
@@ -97,14 +97,14 @@
 
         describe('get', function () {
             beforeEach(function () {
-                for (var i = 0; i < 250; i += 1) {
+                for (var i = 0; i < 550; i += 1) {
                     logStore.error(i);
                 }
             });
 
-            it('should return last 200 records in JSON format', function () {
+            it('should return last 500 records in JSON format', function () {
                 expect(logStore.get()).toEqual(localStorage.getItem('olx-relister-logs'));
-                expect(JSON.parse(logStore.get()).length).toBe(200);
+                expect(JSON.parse(logStore.get()).length).toBe(500);
             });
         });
     });

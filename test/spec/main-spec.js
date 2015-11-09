@@ -208,6 +208,14 @@
                     done();
                 });
             });
+
+            xit('should not start a new timer if auto-refresh if off given a success', function () {
+
+            });
+
+            xit('should not start a new timer if auto-refresh if off given a failure', function () {
+
+            });
         });
 
         describe('given we start the cycle using the timer', function () {
@@ -340,6 +348,14 @@
                     done();
                 });
                 chrome.alarms.trigger();
+            });
+
+            xit('should not start a new timer if auto-refresh if off given a success', function () {
+
+            });
+
+            xit('should not start a new timer if auto-refresh if off given a failure', function () {
+
             });
         });
 

@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    var CAPACITY = 200,
+    var CAPACITY = 500,
         TYPE = {
             log: 0,
             error: 1
