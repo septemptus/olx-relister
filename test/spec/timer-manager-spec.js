@@ -75,6 +75,66 @@
                         done();
                     });
             });
+
+            it('should create an alarm if there is no timestamp', function (done) {
+                var spy = spyOn(chrome.alarms, 'create');
+
+                settings.settings.nextCheck = null;
+
+                timerManager.create()
+                    .then(function () {
+                        expect(spy).toHaveBeenCalled();
+                        done();
+                    });
+            });
+        });
+
+        describe('reload', function () {
+            it('should create an alarm if there is a timestamp', function (done) {
+                var spy = spyOn(chrome.alarms, 'create');
+
+                settings.settings.nextCheck = 123;
+
+                timerManager.reload()
+                    .then(function () {
+                        expect(spy).toHaveBeenCalled();
+                        done();
+                    });
+            });
+
+            it('should not create an alarm if there is no timestamp', function (done) {
+                var spy = spyOn(chrome.alarms, 'create');
+
+                settings.settings.nextCheck = null;
+
+                timerManager.reload()
+                    .then(function () {
+                        expect(spy).not.toHaveBeenCalled();
+                        done();
+                    });
+            });
+        });
+
+        describe('clear', function () {
+            it('should clear the timer from chrome', function (done) {
+                var spy = spyOn(chrome.alarms, 'clear').and.callThrough();
+
+                timerManager.clear()
+                    .then(function () {
+                        expect(spy).toHaveBeenCalled();
+                        done();
+                    });
+            });
+
+            it('should clear the timer from settings', function (done) {
+                var spy = spyOn(settings, 'save').and.callThrough();
+
+                timerManager.clear()
+                    .then(function () {
+                        expect(spy).toHaveBeenCalledWith({ nextCheck: null });
+                        done();
+                    });
+            });
         });
     });
 }());

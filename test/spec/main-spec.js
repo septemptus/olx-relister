@@ -361,5 +361,27 @@
 
             chrome.runtime.sendMessage('olx.copy-logs');
         });
+
+        it('should enable timer on olx.timer.start message', function (done) {
+            var spy = spyOn(timerManager, 'create');
+
+            chrome.runtime.onMessage.addListener(function () {
+                expect(spy).toHaveBeenCalled();
+                done();
+            });
+
+            chrome.runtime.sendMessage('olx.timer.start');
+        });
+
+        it('should disable timer on olx.timer.stop message', function (done) {
+            var spy = spyOn(timerManager, 'clear');
+
+            chrome.runtime.onMessage.addListener(function () {
+                expect(spy).toHaveBeenCalled();
+                done();
+            });
+
+            chrome.runtime.sendMessage('olx.timer.stop');
+        });
     });
 }());

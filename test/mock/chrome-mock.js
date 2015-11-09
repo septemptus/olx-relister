@@ -6,6 +6,9 @@
     window.chrome = {
         alarms: {
             create: noop,
+            clear: function (name, callback) {
+                callback();
+            },
             onAlarm: {
                 listeners: [],
                 addListener: function (fn) {

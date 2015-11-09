@@ -1,6 +1,8 @@
-/* global chrome, settings, moment, logStore */
+/* global Q, chrome, settings, moment, logStore */
 (function () {
     'use strict';
+
+    var TIMER_NAME = 'olx.timer';
 
     function create(withInterval) {
         return settings.load().then(function (loadedSettings) {
@@ -13,7 +15,7 @@
                 nextCheck = Date.now() + (withInterval ? loadedSettings.interval : 0);
             }
 
-            chrome.alarms.create('olx.timer', { when: nextCheck });
+            chrome.alarms.create(TIMER_NAME, { when: nextCheck });
 
             return settings.save({
                 nextCheck: nextCheck
@@ -21,7 +23,37 @@
         });
     }
 
+    function clear() {
+        var deferred = Q.defer();
+
+        logStore.log('Clearing timer');
+
+        chrome.alarms.clear(TIMER_NAME, function () {
+            settings.save({
+                    nextCheck: null
+                })
+                .then(deferred.resolve)
+                .fail(deferred.reject);
+        });
+
+        return deferred.promise;
+    }
+
+    function reload() {
+        logStore.log('Loading old timer');
+        return settings.load().then(function (loadedSettings) {
+            if (loadedSettings.nextCheck) {
+                return create();
+            }
+
+            logStore.log('No old timer detected');
+            return Q.when();
+        });
+    }
+
     window.timerManager = {
-        create: create
+        reload: reload,
+        create: create,
+        clear: clear
     };
 }());
