@@ -4,22 +4,48 @@
 
     var TIMER_NAME = 'olx.timer';
 
-    function create(withInterval) {
+    function set(nextCheck) {
+        chrome.alarms.create(TIMER_NAME, { when: nextCheck });
+
+        return settings.save({
+            nextCheck: nextCheck
+        });
+    }
+
+    function initialize() {
         return settings.load().then(function (loadedSettings) {
             var nextCheck = loadedSettings.nextCheck;
 
             logStore.log('Checking timer', nextCheck);
 
-            if (!nextCheck || moment(nextCheck).isBefore(moment())) {
-                logStore.log('No previous timer set, or timer passed, setting new');
-                nextCheck = Date.now() + (withInterval ? loadedSettings.interval : 0);
+            if (!nextCheck) {
+                logStore.log('No timer to set, moving on');
+
+                return Q.when();
             }
 
-            chrome.alarms.create(TIMER_NAME, { when: nextCheck });
+            if (moment(nextCheck).isBefore(moment())) {
+                logStore.log('Timer passed, setting new');
+                nextCheck = Date.now();
+            }
 
-            return settings.save({
-                nextCheck: nextCheck
-            });
+            return set(nextCheck);
+        });
+    }
+
+    function setLater() {
+        return settings.load().then(function (loadedSettings) {
+            var nextCheck = loadedSettings.nextCheck;
+
+            logStore.log('Checking timer', nextCheck);
+
+            if (!nextCheck) {
+                logStore.log('No timer to set, moving on');
+
+                return Q.when();
+            }
+
+            return set(Date.now() + loadedSettings.interval);
         });
     }
 
@@ -39,21 +65,18 @@
         return deferred.promise;
     }
 
-    function reload() {
-        logStore.log('Loading old timer');
+    function create() {
         return settings.load().then(function (loadedSettings) {
-            if (loadedSettings.nextCheck) {
-                return create();
+            if (!loadedSettings.nextCheck) {
+                return set(Date.now());
             }
-
-            logStore.log('No old timer detected');
-            return Q.when();
         });
     }
 
     window.timerManager = {
-        reload: reload,
-        create: create,
-        clear: clear
+        initialize: initialize,
+        setLater: setLater,
+        clear: clear,
+        create: create
     };
 }());

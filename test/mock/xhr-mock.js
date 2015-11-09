@@ -14,7 +14,7 @@
             }
 
             if (XMLHttpRequestMock.decreasedDelay) {
-                XMLHttpRequestMock.delay -= 100;
+                XMLHttpRequestMock.delay -= 10;
             }
 
             XMLHttpRequestMock.requestTrack.push(this.url);
@@ -39,7 +39,7 @@
         this.failCounter = 0;
         this.requestTrack = [];
         this.responseTrack = [];
-        this.delay = 1000;
+        this.delay = 150;
         this.decreasedDelay = false;
     };
 
@@ -50,7 +50,7 @@
     XMLHttpRequestMock.failCounter = 0;
     XMLHttpRequestMock.requestTrack = [];
     XMLHttpRequestMock.responseTrack = [];
-    XMLHttpRequestMock.delay = 1000;
+    XMLHttpRequestMock.delay = 150;
     XMLHttpRequestMock.decreasedDelay = false;
 
     window.XMLHttpRequest = XMLHttpRequestMock;

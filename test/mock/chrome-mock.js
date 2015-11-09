@@ -3,6 +3,8 @@
 
     function noop() {}
 
+    var timeout;
+
     window.chrome = {
         alarms: {
             create: noop,
@@ -10,20 +12,31 @@
                 callback();
             },
             onAlarm: {
-                listeners: [],
+                listener: null,
+                timers: [],
                 addListener: function (fn) {
-                    this.listeners.push(fn);
+                    this.listener = fn;
                 },
                 clearListeners: function () {
-                    if (this.listeners.length > 1) {
-                        this.listeners.splice(1);
-                    }
+                    this.timers = [];
                 }
             },
-            trigger: function (msgName) {
-                this.onAlarm.listeners.forEach(function (listener) {
-                    listener({ name: msgName || 'olx.timer' });
-                });
+            trigger: function (timer) {
+                this.onAlarm.timers.push(timer);
+                this.onAlarm.listener({ name: timer || 'olx.timer' });
+
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    if (this.onDone){
+                        this.onDone(this.onAlarm.timers);
+                    }
+                }.bind(this), 50);
+            },
+            addOnDone: function (cb) {
+                this.onDone = function () {
+                    this.onDone = null;
+                    cb.apply(null, arguments);
+                }.bind(this);
             }
         },
         notifications: {
@@ -32,20 +45,31 @@
         },
         runtime: {
             onMessage: {
-                listeners: [],
+                listener: null,
+                messages: [],
                 addListener: function (fn) {
-                    this.listeners.push(fn);
+                    this.listener = fn;
                 },
                 clearListeners: function () {
-                    if (this.listeners.length > 1) {
-                        this.listeners.splice(1);
-                    }
+                    this.messages = [];
                 }
             },
             sendMessage: function (msg) {
-                this.onMessage.listeners.forEach(function (listener) {
-                    listener(msg);
-                });
+                this.onMessage.messages.push(msg);
+                this.onMessage.listener(msg);
+
+                clearTimeout(timeout);
+                timeout = setTimeout(function () {
+                    if (this.onDone){
+                        this.onDone(this.onMessage.messages);
+                    }
+                }.bind(this), 50);
+            },
+            addOnDone: function (cb) {
+                this.onDone = function () {
+                    this.onDone = null;
+                    cb.apply(null, arguments);
+                }.bind(this);
             }
         },
         storage: {

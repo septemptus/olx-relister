@@ -27,7 +27,7 @@
         }
 
         function setNewTimer() {
-            timerManager.create(true);
+            timerManager.setLater();
         }
 
         if (cycleInProgress) {
@@ -91,14 +91,19 @@
         }
 
         if (message === 'olx.timer.start') {
-            timerManager.create();
+            timerManager.create().then(function () {
+                chrome.runtime.sendMessage('olx.timer-updated');
+            });
+
             return;
         }
 
         if (message === 'olx.timer.stop') {
-            timerManager.clear();
+            timerManager.clear().then(function () {
+                chrome.runtime.sendMessage('olx.timer-updated');
+            });
         }
     });
 
-    timerManager.reload();
+    timerManager.initialize();
 }());
