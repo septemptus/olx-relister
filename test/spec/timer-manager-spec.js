@@ -98,10 +98,8 @@
                     });
             });
 
-            it('should create an alarm for after an interval', function (done) {
+            it('should create an alarm for after an interval regardless of next check', function (done) {
                 var spy = spyOn(chrome.alarms, 'create');
-
-                settings.settings.nextCheck = Date.now() - 100000;
 
                 timerManager.setLater()
                     .then(function () {
@@ -155,6 +153,17 @@
                 timerManager.create()
                     .then(function () {
                         expect(spy).toHaveBeenCalled();
+                        done();
+                    });
+            });
+
+            it('should create a timer with an interval regardless of next check', function (done) {
+                var spy = spyOn(chrome.alarms, 'create');
+
+                timerManager.setLater()
+                    .then(function () {
+                        expect(spy.calls.argsFor(0)[1].when).toBeLessThan(Date.now() + settings.settings.interval + 10000);
+                        expect(spy.calls.argsFor(0)[1].when).toBeGreaterThan(Date.now() + settings.settings.interval - 10000);
                         done();
                     });
             });

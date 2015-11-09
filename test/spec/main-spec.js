@@ -232,7 +232,7 @@
             });
 
             it('should start a new timer given a success', function (done) {
-                var spy = spyOn(timerManager, 'setLater');
+                var spy = spyOn(timerManager, 'setLater').and.callThrough();
 
                 chrome.runtime.addOnDone(function () {
                     expect(spy).toHaveBeenCalled();
@@ -243,7 +243,7 @@
             });
 
             it('should start a new timer given a failure', function (done) {
-                var spy = spyOn(timerManager, 'setLater');
+                var spy = spyOn(timerManager, 'setLater').and.callThrough();
 
                 getMessagesSpy = jasmine.createSpy().and.returnValue(false);
 
@@ -365,7 +365,7 @@
             });
 
             it('should start a new timer given a success', function (done) {
-                var spy = spyOn(timerManager, 'setLater');
+                var spy = spyOn(timerManager, 'setLater').and.callThrough();
 
                 chrome.runtime.addOnDone(function () {
                     expect(spy).toHaveBeenCalled();
@@ -376,7 +376,7 @@
             });
 
             it('should start a new timer given a failure', function (done) {
-                var spy = spyOn(timerManager, 'setLater');
+                var spy = spyOn(timerManager, 'setLater').and.callThrough();
 
                 getMessagesSpy = jasmine.createSpy().and.returnValue(false);
 

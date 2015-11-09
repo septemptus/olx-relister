@@ -27,7 +27,7 @@
         }
 
         function setNewTimer() {
-            timerManager.setLater();
+            return timerManager.setLater();
         }
 
         if (cycleInProgress) {
@@ -57,8 +57,9 @@
                 cycleInProgress = false;
                 logStore.error('Flow broken', e);
                 notificator.notifyError(e);
-                setNewTimer();
-                chrome.runtime.sendMessage('olx.cycle-failed');
+                setNewTimer().then(function () {
+                    chrome.runtime.sendMessage('olx.cycle-failed');
+                });
             });
     }
 

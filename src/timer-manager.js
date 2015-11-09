@@ -68,7 +68,7 @@
     function create() {
         return settings.load().then(function (loadedSettings) {
             if (!loadedSettings.nextCheck) {
-                return set(Date.now());
+                return set(Date.now() + loadedSettings.interval);
             }
         });
     }
