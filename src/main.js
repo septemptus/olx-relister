@@ -106,5 +106,7 @@
         }
     });
 
-    timerManager.initialize();
+    window.onload = function () {
+        timerManager.initialize();
+    };
 }());
