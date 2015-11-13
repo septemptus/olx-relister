@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "OLX Relister",
     "description": "Looks through your email and clicks stuff.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "browser_action": {
         "default_popup": "popup/popup.html"
     },
