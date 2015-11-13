@@ -4,6 +4,15 @@
 
     var TIMER_NAME = 'olx.timer';
 
+    function getNextCheck(settings) {
+        return moment()
+            .add({ days: 1 })
+            .hour(settings.checkHour.hour)
+            .minute(settings.checkHour.minute)
+            .startOf('minute')
+            .valueOf();
+    }
+
     function set(nextCheck) {
         chrome.alarms.create(TIMER_NAME, { when: nextCheck });
 
@@ -33,7 +42,7 @@
         });
     }
 
-    function setLater() {
+    function setNew() {
         return settings.load().then(function (loadedSettings) {
             var nextCheck = loadedSettings.nextCheck;
 
@@ -45,7 +54,7 @@
                 return Q.when();
             }
 
-            return set(Date.now() + loadedSettings.interval);
+            return set(getNextCheck(loadedSettings));
         });
     }
 
@@ -68,14 +77,14 @@
     function create() {
         return settings.load().then(function (loadedSettings) {
             if (!loadedSettings.nextCheck) {
-                return set(Date.now() + loadedSettings.interval);
+                return set(getNextCheck(loadedSettings));
             }
         });
     }
 
     window.timerManager = {
         initialize: initialize,
-        setLater: setLater,
+        setNew: setNew,
         clear: clear,
         create: create
     };

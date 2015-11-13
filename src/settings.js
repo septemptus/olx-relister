@@ -5,7 +5,7 @@
     var DEFAULTS = {
         labelFrom: null,
         labelTo: null,
-        interval: 3 * 60 * 60 * 1000,
+        checkHour: null,
         lastSuccess: null,
         nextCheck: null,
         markAsRead: false,

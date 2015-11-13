@@ -1,4 +1,4 @@
-/* global timerManager, Q, chrome, settings */
+/* global moment, timerManager, Q, chrome, settings */
 (function () {
     'use strict';
 
@@ -7,7 +7,10 @@
             window.settings = {
                 settings: {
                     nextCheck: 123,
-                    interval: 50000000
+                    checkHour: {
+                        hour: 20,
+                        minute: 0
+                    }
                 },
                 load: function () {
                     return Q.when(this.settings);
@@ -77,11 +80,11 @@
             });
         });
 
-        describe('setLater', function () {
+        describe('setNew', function () {
             it('should save the next alarm timestamp in the settings', function (done) {
                 var spy = spyOn(settings, 'save').and.callThrough();
 
-                timerManager.setLater()
+                timerManager.setNew()
                     .then(function () {
                         expect(spy.calls.argsFor(0)[0].nextCheck).toBeDefined();
                         done();
@@ -91,7 +94,7 @@
             it('should create a new alarm', function (done) {
                 var spy = spyOn(chrome.alarms, 'create');
 
-                timerManager.setLater()
+                timerManager.setNew()
                     .then(function () {
                         expect(spy).toHaveBeenCalled();
                         done();
@@ -99,12 +102,16 @@
             });
 
             it('should create an alarm for after an interval regardless of next check', function (done) {
-                var spy = spyOn(chrome.alarms, 'create');
+                var spy = spyOn(chrome.alarms, 'create'),
+                    targetTime = moment().hour(20).startOf('hour');
 
-                timerManager.setLater()
+                if (targetTime.isBefore(moment())) {
+                    targetTime.add(1, 'days');
+                }
+
+                timerManager.setNew()
                     .then(function () {
-                        expect(spy.calls.argsFor(0)[1].when).toBeLessThan(Date.now() + settings.settings.interval + 10000);
-                        expect(spy.calls.argsFor(0)[1].when).toBeGreaterThan(Date.now() + settings.settings.interval - 10000);
+                        expect(spy.calls.argsFor(0)[1].when).toBe(targetTime.valueOf());
                         done();
                     });
             });
@@ -114,7 +121,7 @@
 
                 settings.settings.nextCheck = null;
 
-                timerManager.setLater()
+                timerManager.setNew()
                     .then(function () {
                         expect(spy).not.toHaveBeenCalled();
                         done();
@@ -157,13 +164,19 @@
                     });
             });
 
-            it('should create a timer with an interval regardless of next check', function (done) {
-                var spy = spyOn(chrome.alarms, 'create');
+            it('should create a timer with an interval if there is no next check', function (done) {
+                var spy = spyOn(chrome.alarms, 'create'),
+                    targetTime = moment().hour(20).startOf('hour');
 
-                timerManager.setLater()
+                if (targetTime.isBefore(moment())) {
+                    targetTime.add(1, 'days');
+                }
+
+                settings.settings.nextCheck = null;
+
+                timerManager.create()
                     .then(function () {
-                        expect(spy.calls.argsFor(0)[1].when).toBeLessThan(Date.now() + settings.settings.interval + 10000);
-                        expect(spy.calls.argsFor(0)[1].when).toBeGreaterThan(Date.now() + settings.settings.interval - 10000);
+                        expect(spy.calls.argsFor(0)[1].when).toBe(targetTime.valueOf());
                         done();
                     });
             });

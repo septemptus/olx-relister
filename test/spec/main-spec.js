@@ -29,8 +29,8 @@
             clear: function () {
                 return returnPromise(clearSpy);
             },
-            setLater: function () {
-                return returnPromise(setLaterSpy);
+            setNew: function () {
+                return returnPromise(setNewSpy);
             },
             initialize: function () {
                 return returnPromise(initializeSpy);
@@ -50,7 +50,7 @@
         requestSpy,
         createSpy,
         clearSpy,
-        setLaterSpy,
+        setNewSpy,
         initializeSpy;
 
     function returnPromise(spy) {
@@ -79,7 +79,7 @@
         requestSpy = jasmine.createSpy().and.returnValue(true);
         createSpy = jasmine.createSpy().and.returnValue(true);
         clearSpy = jasmine.createSpy().and.returnValue(true);
-        setLaterSpy = jasmine.createSpy().and.returnValue(true);
+        setNewSpy = jasmine.createSpy().and.returnValue(true);
         initializeSpy = jasmine.createSpy().and.returnValue(true);
 
         window.ApiWrapper = ApiWrapperMock;
@@ -106,7 +106,7 @@
         requestSpy.calls.reset();
         createSpy.calls.reset();
         clearSpy.calls.reset();
-        setLaterSpy.calls.reset();
+        setNewSpy.calls.reset();
         initializeSpy.calls.reset();
         notificatorMock.notifySuccess.calls.reset();
         notificatorMock.notifyError.calls.reset();
@@ -232,7 +232,7 @@
             });
 
             it('should start a new timer given a success', function (done) {
-                var spy = spyOn(timerManager, 'setLater').and.callThrough();
+                var spy = spyOn(timerManager, 'setNew').and.callThrough();
 
                 chrome.runtime.addOnDone(function () {
                     expect(spy).toHaveBeenCalled();
@@ -243,7 +243,7 @@
             });
 
             it('should start a new timer given a failure', function (done) {
-                var spy = spyOn(timerManager, 'setLater').and.callThrough();
+                var spy = spyOn(timerManager, 'setNew').and.callThrough();
 
                 getMessagesSpy = jasmine.createSpy().and.returnValue(false);
 
@@ -365,7 +365,7 @@
             });
 
             it('should start a new timer given a success', function (done) {
-                var spy = spyOn(timerManager, 'setLater').and.callThrough();
+                var spy = spyOn(timerManager, 'setNew').and.callThrough();
 
                 chrome.runtime.addOnDone(function () {
                     expect(spy).toHaveBeenCalled();
@@ -376,7 +376,7 @@
             });
 
             it('should start a new timer given a failure', function (done) {
-                var spy = spyOn(timerManager, 'setLater').and.callThrough();
+                var spy = spyOn(timerManager, 'setNew').and.callThrough();
 
                 getMessagesSpy = jasmine.createSpy().and.returnValue(false);
 

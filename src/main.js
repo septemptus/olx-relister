@@ -27,7 +27,7 @@
         }
 
         function setNewTimer() {
-            return timerManager.setLater();
+            return timerManager.setNew();
         }
 
         if (cycleInProgress) {
