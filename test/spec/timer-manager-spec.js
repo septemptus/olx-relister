@@ -113,14 +113,14 @@
                     });
             });
 
-            it('should not create an alarm if there is no timestamp', function (done) {
+            it('should create an alarm if there is no timestamp', function (done) {
                 var spy = spyOn(chrome.alarms, 'create');
 
                 settings.settings.nextCheck = null;
 
                 timerManager.setNew()
                     .then(function () {
-                        expect(spy).not.toHaveBeenCalled();
+                        expect(spy).toHaveBeenCalled();
                         done();
                     });
             });

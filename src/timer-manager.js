@@ -24,6 +24,7 @@
     }
 
     function set(nextCheck) {
+        logStore.log('Setting timer', nextCheck);
         chrome.alarms.create(TIMER_NAME, { when: nextCheck });
 
         return settings.save({
@@ -54,16 +55,6 @@
 
     function setNew() {
         return settings.load().then(function (loadedSettings) {
-            var nextCheck = loadedSettings.nextCheck;
-
-            logStore.log('Checking timer', nextCheck);
-
-            if (!nextCheck) {
-                logStore.log('No timer to set, moving on');
-
-                return Q.when();
-            }
-
             return set(getNextCheck(loadedSettings));
         });
     }
