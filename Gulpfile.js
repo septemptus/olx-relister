@@ -91,7 +91,7 @@
 
     gulp.task('copy-assets', ['copy-html', 'copy-images', 'clean-build']);
 
-    gulp.task('build', ['copy-lib', 'copy-assets', 'modify-manifest', 'styles', 'minify', 'minify-popup-script']);
+    gulp.task('build', ['test-postbuild']);
 
     gulp.task('build-release', ['clean-rel', 'build', 'bump-versions'], function () {
         return gulp.src('build/**')
@@ -139,6 +139,18 @@
 
         new Server({
             configFile: process.cwd() + '\\test\\karma.conf.js',
+            singleRun: true
+        }, done).start();
+    });
+
+    gulp.task('test-postbuild', ['copy-lib', 'copy-assets', 'modify-manifest', 'styles', 'minify', 'minify-popup-script'], function (done) {
+        if (process.argv.indexOf('--force') !== -1) {
+            done();
+            return;
+        }
+
+        new Server({
+            configFile: process.cwd() + '\\test\\karma.postbuild.conf.js',
             singleRun: true
         }, done).start();
     });
