@@ -23,9 +23,6 @@
             notifyError: jasmine.createSpy()
         },
         timerManagerMock = {
-            create: function () {
-                return returnPromise(createSpy);
-            },
             clear: function () {
                 return returnPromise(clearSpy);
             },
@@ -48,7 +45,6 @@
         switchLabelsSpy,
         getLinksSpy,
         requestSpy,
-        createSpy,
         clearSpy,
         setNewSpy,
         initializeSpy;
@@ -77,7 +73,6 @@
         switchLabelsSpy = jasmine.createSpy().and.returnValue(true);
         getLinksSpy = jasmine.createSpy().and.returnValue(true);
         requestSpy = jasmine.createSpy().and.returnValue(true);
-        createSpy = jasmine.createSpy().and.returnValue(true);
         clearSpy = jasmine.createSpy().and.returnValue(true);
         setNewSpy = jasmine.createSpy().and.returnValue(true);
         initializeSpy = jasmine.createSpy().and.returnValue(true);
@@ -104,7 +99,6 @@
         getMessagesSpy.calls.reset();
         switchLabelsSpy.calls.reset();
         requestSpy.calls.reset();
-        createSpy.calls.reset();
         clearSpy.calls.reset();
         setNewSpy.calls.reset();
         initializeSpy.calls.reset();
@@ -413,7 +407,7 @@
 
         it('should enable timer on olx.timer.start message', function (done) {
             chrome.runtime.addOnDone(function () {
-                expect(createSpy).toHaveBeenCalled();
+                expect(setNewSpy).toHaveBeenCalled();
                 done();
             });
 

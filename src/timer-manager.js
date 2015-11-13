@@ -5,12 +5,22 @@
     var TIMER_NAME = 'olx.timer';
 
     function getNextCheck(settings) {
-        return moment()
-            .add({ days: 1 })
+        var target = moment(Date.now());
+
+        if (!settings.checkHour) {
+            throw 'Check hour is not defined';
+        }
+
+        target
             .hour(settings.checkHour.hour)
             .minute(settings.checkHour.minute)
-            .startOf('minute')
-            .valueOf();
+            .startOf('minute');
+
+        if (target.isBefore(moment(Date.now()))) {
+            target.add({ days: 1 });
+        }
+
+        return target.valueOf();
     }
 
     function set(nextCheck) {
@@ -74,18 +84,9 @@
         return deferred.promise;
     }
 
-    function create() {
-        return settings.load().then(function (loadedSettings) {
-            if (!loadedSettings.nextCheck) {
-                return set(getNextCheck(loadedSettings));
-            }
-        });
-    }
-
     window.timerManager = {
         initialize: initialize,
         setNew: setNew,
-        clear: clear,
-        create: create
+        clear: clear
     };
 }());

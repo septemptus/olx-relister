@@ -11,7 +11,7 @@
         copyButtonEl,
         lastSuccessEl,
         nextCheckEl,
-        autoRefreshEl;
+        hourEl;
 
     function flash(className) {
         document.body.classList.add(className);
@@ -22,6 +22,12 @@
     }
 
     function loadOptions() {
+        function getTwoDigitString(num) {
+            var numString = '' + num;
+
+            return numString.length === 2 ? numString : '0' + numString;
+        }
+
         settings.load().then(function (settings) {
             labelFromEl.value = settings.labelFrom;
             labelToEl.value = settings.labelTo;
@@ -29,7 +35,9 @@
             removeFromInboxEl.checked = settings.removeFromInbox;
             lastSuccessEl.innerHTML = settings.lastSuccess ? moment(settings.lastSuccess).format(DATE_FORMAT) : '-';
             nextCheckEl.innerHTML = settings.nextCheck ? moment(settings.nextCheck).format(DATE_FORMAT) : '-';
-            autoRefreshEl.checked = !!settings.nextCheck;
+            if (document.activeElement !== hourEl) {
+                hourEl.value = settings.checkHour ? getTwoDigitString(settings.checkHour.hour) + ':' + getTwoDigitString(settings.checkHour.minute) : '';
+            }
         }).fail(function (e) {
             logStore.error('Failed to load settings', e);
         });
@@ -42,8 +50,10 @@
         setting[labelToEl.name] = labelToEl.value || null;
         setting[markAsReadEl.name] = markAsReadEl.checked;
         setting[removeFromInboxEl.name] = removeFromInboxEl.checked;
+        setting[hourEl.name] = hourEl.value ? { hour: ~~hourEl.value.substring(0, 2), minute: ~~hourEl.value.substring(3, 5)} : null;
 
         settings.save(setting)
+            .then(toggleAutoRefresh)
             .fail(function () {
                 flash('error');
             });
@@ -60,7 +70,7 @@
     function toggleAutoRefresh() {
         var message = 'olx.timer.stop';
 
-        if (autoRefreshEl.checked) {
+        if (hourEl.value) {
             message = 'olx.timer.start';
         }
 
@@ -76,7 +86,7 @@
         lastSuccessEl = document.querySelector('#last-success');
         nextCheckEl = document.querySelector('#next-check');
         copyButtonEl = document.querySelector('[name=logs]');
-        autoRefreshEl = document.querySelector('[name=autoRefresh]');
+        hourEl = document.querySelector('[name=checkHour]');
 
         forceButtonEl.addEventListener('click', sendEvent);
         copyButtonEl.addEventListener('click', copyLogs);
@@ -86,7 +96,7 @@
         markAsReadEl.addEventListener('click', save);
         removeFromInboxEl.addEventListener('click', save);
 
-        autoRefreshEl.addEventListener('click', toggleAutoRefresh);
+        hourEl.addEventListener('input', save);
     });
 
     chrome.runtime.onMessage.addListener(function (message) {

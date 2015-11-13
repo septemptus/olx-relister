@@ -1,4 +1,4 @@
-/* global moment, timerManager, Q, chrome, settings */
+/* global timerManager, Q, chrome, settings */
 (function () {
     'use strict';
 
@@ -102,16 +102,13 @@
             });
 
             it('should create an alarm for after an interval regardless of next check', function (done) {
-                var spy = spyOn(chrome.alarms, 'create'),
-                    targetTime = moment().hour(20).startOf('hour');
+                var spy = spyOn(chrome.alarms, 'create');
 
-                if (targetTime.isBefore(moment())) {
-                    targetTime.add(1, 'days');
-                }
+                spyOn(Date, 'now').and.returnValue(1315699200000);
 
                 timerManager.setNew()
                     .then(function () {
-                        expect(spy.calls.argsFor(0)[1].when).toBe(targetTime.valueOf());
+                        expect(spy.calls.argsFor(0)[1].when).toBe(1315764000000);
                         done();
                     });
             });
@@ -124,6 +121,16 @@
                 timerManager.setNew()
                     .then(function () {
                         expect(spy).not.toHaveBeenCalled();
+                        done();
+                    });
+            });
+
+            it('should fail if check hour is not defined', function (done) {
+                settings.settings.checkHour = null;
+
+                timerManager.setNew()
+                    .fail(function (e) {
+                        expect(e).toBe('Check hour is not defined');
                         done();
                     });
             });
@@ -146,49 +153,6 @@
                 timerManager.clear()
                     .then(function () {
                         expect(spy).toHaveBeenCalledWith({ nextCheck: null });
-                        done();
-                    });
-            });
-        });
-
-        describe('create', function () {
-            it('should create a timer if there was no timer before', function (done) {
-                var spy = spyOn(chrome.alarms, 'create');
-
-                settings.settings.nextCheck = null;
-
-                timerManager.create()
-                    .then(function () {
-                        expect(spy).toHaveBeenCalled();
-                        done();
-                    });
-            });
-
-            it('should create a timer with an interval if there is no next check', function (done) {
-                var spy = spyOn(chrome.alarms, 'create'),
-                    targetTime = moment().hour(20).startOf('hour');
-
-                if (targetTime.isBefore(moment())) {
-                    targetTime.add(1, 'days');
-                }
-
-                settings.settings.nextCheck = null;
-
-                timerManager.create()
-                    .then(function () {
-                        expect(spy.calls.argsFor(0)[1].when).toBe(targetTime.valueOf());
-                        done();
-                    });
-            });
-
-            it('should not create a timer if there was a timer before', function (done) {
-                var spy = spyOn(chrome.alarms, 'create');
-
-                settings.settings.nextCheck = 123;
-
-                timerManager.create()
-                    .then(function () {
-                        expect(spy).not.toHaveBeenCalled();
                         done();
                     });
             });

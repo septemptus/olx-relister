@@ -16,4 +16,4 @@ TODO
 - ~~Fix an issue with bad label format being sent with the modify call~~
 - ~~Send requests in sequence~~
 - Add lang file, events, etc.
-- Add UI for timer settings
+- ~~Add UI for timer settings~~

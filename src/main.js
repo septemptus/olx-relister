@@ -92,7 +92,7 @@
         }
 
         if (message === 'olx.timer.start') {
-            timerManager.create().then(function () {
+            timerManager.setNew().then(function () {
                 chrome.runtime.sendMessage('olx.timer-updated');
             });
 
