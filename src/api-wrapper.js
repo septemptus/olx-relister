@@ -5,6 +5,7 @@
     function ApiWrapper() {
         var INBOX_LABEL = 'INBOX',
             UNREAD_LABEL = 'UNREAD',
+            PROMPT_TIMEOUT = 30 * 1000,
             clientId = '113558311566-rcfi51rf2e1p5jbn6rcf5ur8m4bnft9m.apps.googleusercontent.com',
             scope = 'https://www.googleapis.com/auth/gmail.modify',
             authorizationExpiryTime = null,
@@ -37,6 +38,12 @@
                             logStore.error('Authorization error (with prompt)');
                             deferred.reject('Non-immediate authorization failed');
                         });
+
+                    setTimeout(function () {
+                        logStore.error('Privileges prompt failed, timed out');
+                        deferred.reject('Privileges prompt failed, timed out');
+                    }, PROMPT_TIMEOUT);
+
                     return;
                 }
 
