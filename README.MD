@@ -17,3 +17,4 @@ TODO
 - ~~Send requests in sequence~~
 - Add lang file, events, etc.
 - ~~Add UI for timer settings~~
+- Move promise conversions to a separate library (code repetition)
