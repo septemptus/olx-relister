@@ -1,8 +1,12 @@
-/* global settings, chrome, moment, logStore */
+/* global utils, constants, settings, chrome, moment, logStore */
 (function () {
     'use strict';
 
-    var DATE_FORMAT = 'DD.MM.YYYY HH:mm',
+    var formats = constants.formats,
+        events = constants.events,
+        strings = constants.strings,
+        regexps = constants.regexps,
+        selectors = constants.selectors,
         labelFromEl,
         labelToEl,
         markAsReadEl,
@@ -13,80 +17,75 @@
         nextCheckEl,
         hourEl;
 
-    function flash(className) {
-        document.body.classList.add(className);
-
-        setTimeout(function () {
-            document.body.classList.remove(className);
-        }, 500);
-    }
-
     function loadOptions() {
-        function getTwoDigitString(num) {
-            var numString = '' + num;
-
-            return numString.length === 2 ? numString : '0' + numString;
-        }
-
         settings.load().then(function (settings) {
             labelFromEl.value = settings.labelFrom;
             labelToEl.value = settings.labelTo;
             markAsReadEl.checked = settings.markAsRead;
             removeFromInboxEl.checked = settings.removeFromInbox;
-            lastSuccessEl.innerHTML = settings.lastSuccess ? moment(settings.lastSuccess).format(DATE_FORMAT) : '-';
-            nextCheckEl.innerHTML = settings.nextCheck ? moment(settings.nextCheck).format(DATE_FORMAT) : '-';
+            lastSuccessEl.innerHTML = settings.lastSuccess ? moment(settings.lastSuccess).format(formats.DATE_FORMAT) : strings.NOT_PRESENT;
+            nextCheckEl.innerHTML = settings.nextCheck ? moment(settings.nextCheck).format(formats.DATE_FORMAT) : strings.NOT_PRESENT;
             if (document.activeElement !== hourEl) {
-                hourEl.value = settings.checkHour ? getTwoDigitString(settings.checkHour.hour) + ':' + getTwoDigitString(settings.checkHour.minute) : '';
+                hourEl.value = utils.createHour(settings.checkHour);
             }
         }).fail(function (e) {
-            logStore.error('Failed to load settings', e);
+            logStore.error(strings.SETTINGS_LOAD_FAILED, e);
         });
     }
 
     function save() {
-        var setting = {};
+        var setting = {},
+            hour = null;
+
+        if (hourEl.value) {
+            hour = hourEl.value.match(regexps.HOUR);
+            hour = {
+                hour: hour[1],
+                minute: hour[2]
+            };
+        }
 
         setting[labelFromEl.name] = labelFromEl.value || null;
         setting[labelToEl.name] = labelToEl.value || null;
         setting[markAsReadEl.name] = markAsReadEl.checked;
         setting[removeFromInboxEl.name] = removeFromInboxEl.checked;
-        setting[hourEl.name] = hourEl.value ? { hour: ~~hourEl.value.substring(0, 2), minute: ~~hourEl.value.substring(3, 5)} : null;
+        setting[hourEl.name] = hour;
 
         settings.save(setting)
             .then(toggleAutoRefresh)
             .fail(function () {
-                flash('error');
+                utils.flash(true);
             });
     }
 
     function sendEvent() {
-        chrome.runtime.sendMessage('olx.run');
+        chrome.runtime.sendMessage(events.CYCLE_RUN);
     }
 
     function copyLogs() {
-        chrome.runtime.sendMessage('olx.copy-logs');
+        chrome.runtime.sendMessage(events.LOGS_COPY);
     }
 
     function toggleAutoRefresh() {
-        var message = 'olx.timer.stop';
+        var message = events.TIMER_STOP;
 
         if (hourEl.value) {
-            message = 'olx.timer.start';
+            message = events.TIMER_START;
         }
 
         chrome.runtime.sendMessage(message);
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        labelFromEl = document.querySelector('[name=labelFrom]');
-        labelToEl = document.querySelector('[name=labelTo]');
-        markAsReadEl = document.querySelector('[name=markAsRead]');
-        removeFromInboxEl = document.querySelector('[name=removeFromInbox]');
-        forceButtonEl = document.querySelector('[name=force]');
-        lastSuccessEl = document.querySelector('#last-success');
-        nextCheckEl = document.querySelector('#next-check');
-        copyButtonEl = document.querySelector('[name=logs]');
-        hourEl = document.querySelector('[name=checkHour]');
+        labelFromEl = document.querySelector(selectors.LABEL_FROM);
+        labelToEl = document.querySelector(selectors.LABEL_TO);
+        markAsReadEl = document.querySelector(selectors.MARK_AS_READ);
+        removeFromInboxEl = document.querySelector(selectors.REMOVE_FROM_INBOX);
+        forceButtonEl = document.querySelector(selectors.FORCE);
+        lastSuccessEl = document.querySelector(selectors.LAST_SUCCESS);
+        nextCheckEl = document.querySelector(selectors.NEXT_CHECK);
+        copyButtonEl = document.querySelector(selectors.COPY_LOGS);
+        hourEl = document.querySelector(selectors.CHECK_HOUR);
 
         forceButtonEl.addEventListener('click', sendEvent);
         copyButtonEl.addEventListener('click', copyLogs);
@@ -100,22 +99,22 @@
     });
 
     chrome.runtime.onMessage.addListener(function (message) {
-        if (message === 'olx.cycle-end') {
-            lastSuccessEl.innerHTML = moment().format(DATE_FORMAT);
-            flash('success');
+        if (message === events.CYCLE_END) {
+            lastSuccessEl.innerHTML = moment().format(formats.DATE_FORMAT);
+            utils.flash();
             loadOptions();
         }
 
-        if (message === 'olx.cycle-failed') {
-            flash('error');
+        if (message === events.CYCLE_FAILED) {
+            utils.flash(true);
             loadOptions();
         }
 
-        if (message === 'olx.logs-copied') {
-            flash('success');
+        if (message === events.LOGS_COPIED) {
+            utils.flash();
         }
 
-        if (message === 'olx.timer-updated') {
+        if (message === events.TIMER_UPDATED) {
             loadOptions();
         }
     });
