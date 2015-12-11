@@ -57,7 +57,7 @@
                 cycleInProgress = false;
                 logStore.error('Flow broken', e);
                 notificator.notifyError(e);
-                setNewTimer().then(function () {
+                setNewTimer().finally(function () {
                     chrome.runtime.sendMessage('olx.cycle-failed');
                 });
             });
