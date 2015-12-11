@@ -26,22 +26,33 @@
                 client_id: clientId,
                 scope: scope
             }, function (response) {
+                var resolved = false;
+
                 if (response.error === 'immediate_failed') {
                     logStore.log('Privileges not set, prompting');
                     authorize(false)
                         .then(function (response) {
-                            logStore.log('Authorization successful');
-                            authorizationExpiryTime = moment(Number(response.expires_at) * 1000);
-                            deferred.resolve(response);
+                            if (!resolved) {
+                                logStore.log('Authorization successful');
+                                authorizationExpiryTime = moment(Number(response.expires_at) * 1000);
+                                deferred.resolve(response);
+                                resolved = true;
+                            }
                         })
                         .fail(function () {
-                            logStore.error('Authorization error (with prompt)');
-                            deferred.reject('Non-immediate authorization failed');
+                            if (!resolved) {
+                                logStore.error('Authorization error (with prompt)');
+                                deferred.reject('Non-immediate authorization failed');
+                                resolved = true;
+                            }
                         });
 
                     setTimeout(function () {
-                        logStore.error('Privileges prompt failed, timed out');
-                        deferred.reject('Privileges prompt failed, timed out');
+                        if (!resolved) {
+                            logStore.error('Privileges prompt failed, timed out');
+                            deferred.reject('Privileges prompt failed, timed out');
+                            resolved = true;
+                        }
                     }, PROMPT_TIMEOUT);
 
                     return;
