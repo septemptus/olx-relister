@@ -1,6 +1,6 @@
 {
   "name": "olx_relister",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Looks through your email and clicks stuff.",
   "repository": {
     "type": "git",
