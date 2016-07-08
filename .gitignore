@@ -2,3 +2,4 @@
 node_modules/
 build/
 rel/
+*-compiled.js*

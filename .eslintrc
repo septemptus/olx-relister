@@ -1,0 +1,25 @@
+{
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "env": {
+    "browser": "true"
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "no-console": ["error", { "allow": ["error"]}],
+    "curly": "error",
+    "eqeqeq": "error",
+    "no-else-return": "error",
+    "no-extra-bind": "error",
+    "no-implicit-globals": "error",
+    "no-useless-call": "error",
+    "no-with": "error",
+    "yoda": "error",
+    "array-bracket-spacing": "error",
+    "block-spacing": "error",
+    "comma-dangle": "error",
+    "no-var": "error"
+  }
+}
