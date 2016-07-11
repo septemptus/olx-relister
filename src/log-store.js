@@ -1,59 +1,50 @@
-/* global console */
-(function () {
-    'use strict';
+const CAPACITY = 500;
+const TYPE = {
+    log: 0,
+    error: 1
+};
+const LOCAL_STORAGE_KEY = 'olx-relister-logs';
 
-    var CAPACITY = 500,
-        TYPE = {
-            log: 0,
-            error: 1
-        },
-        localStorageKey = 'olx-relister-logs';
+function joinArgs(...args) {
+    return args.reduce((acc, param) => acc + ' ' + (typeof param === 'string' ? param : JSON.stringify(param)), '').trim();
+}
 
-    function joinArgs(args) {
-        var params = [].slice.apply(args);
+function storeLog(args, type) {
+    let logs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
 
-        return params.reduce(function (acc, param) {
-            return acc + ' ' + (typeof param === 'string' ? param : JSON.stringify(param));
-        }, '').trim();
+    if (!logs) {
+        logs = [];
     }
 
-    function storeLog(args, type) {
-        var logs = JSON.parse(localStorage.getItem(localStorageKey));
-
-        if (!logs) {
-            logs = [];
-        }
-
-        if (logs.length === CAPACITY) {
-            logs.shift();
-        }
-
-        logs.push({
-            ts: Date.now(),
-            type: type,
-            msg: joinArgs(args)
-        });
-
-        localStorage.setItem(localStorageKey, JSON.stringify(logs));
+    if (logs.length === CAPACITY) {
+        logs.shift();
     }
 
-    function log() {
-        console.log.apply(console, arguments);
-        storeLog(arguments, TYPE.log);
-    }
+    logs.push({
+        ts: Date.now(),
+        type: type,
+        msg: joinArgs(args)
+    });
 
-    function error() {
-        console.error.apply(console, arguments);
-        storeLog(arguments, TYPE.error);
-    }
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(logs));
+}
 
-    function get() {
-        return localStorage.getItem(localStorageKey);
-    }
+function log() {
+    console.log.apply(console, arguments);
+    storeLog(arguments, TYPE.log);
+}
 
-    window.logStore = {
-        log: log,
-        error: error,
-        get: get
-    };
-}());
+function error() {
+    console.error.apply(console, arguments);
+    storeLog(arguments, TYPE.error);
+}
+
+function get() {
+    return localStorage.getItem(LOCAL_STORAGE_KEY);
+}
+
+export default {
+    log: log,
+    error: error,
+    get: get
+};

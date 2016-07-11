@@ -1,46 +1,43 @@
-/* global chrome */
-(function () {
-    'use strict';
+import chrome from 'chrome';
 
-    var DEFAULT_OPTIONS = {
-            type: 'basic',
-            iconUrl: 'img/ico120.png'
-        },
-        lastNID;
+const DEFAULT_OPTIONS = {
+        type: 'basic',
+        iconUrl: 'img/ico120.png'
+    };
+let lastNID;
 
-    function notify(options) {
-        var mergedOptions = {
-            type: DEFAULT_OPTIONS.type,
-            iconUrl: DEFAULT_OPTIONS.iconUrl,
-            message: options.message,
-            title: options.title
-        };
+function notify(options) {
+    let mergedOptions = {
+        type: DEFAULT_OPTIONS.type,
+        iconUrl: DEFAULT_OPTIONS.iconUrl,
+        message: options.message,
+        title: options.title
+    };
 
-        chrome.notifications.create(null, mergedOptions, function (nid) {
-            if (lastNID) {
-                chrome.notifications.clear(lastNID);
-            }
+    chrome.notifications.create(null, mergedOptions, (nid) => {
+        if (lastNID) {
+            chrome.notifications.clear(lastNID);
+        }
 
-            lastNID = nid;
-        });
+        lastNID = nid;
+    });
 }
 
-    function notifySuccess() {
-        notify({
-            title: 'Ogłoszenia odświeżone',
-            message: 'Wszystkie ogłoszenia zostały odświeżone'
-        });
-    }
+function notifySuccess() {
+    notify({
+        title: 'Ogłoszenia odświeżone',
+        message: 'Wszystkie ogłoszenia zostały odświeżone'
+    });
+}
 
-    function notifyError(error) {
-        notify({
-            title: 'Wystąpił błąd',
-            message: 'Wystąpił błąd przy odświeżaniu ogłoszeń' + (typeof error === 'string' ? ': ' + error : '')
-        });
-    }
+function notifyError(error) {
+    notify({
+        title: 'Wystąpił błąd',
+        message: 'Wystąpił błąd przy odświeżaniu ogłoszeń' + (typeof error === 'string' ? ': ' + error : '')
+    });
+}
 
-    window.notificator = {
-        notifySuccess: notifySuccess,
-        notifyError: notifyError
-    };
-}());
+export default {
+    notifySuccess: notifySuccess,
+    notifyError: notifyError
+};

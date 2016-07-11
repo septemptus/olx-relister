@@ -12,6 +12,9 @@ import jshint from 'gulp-jshint';
 import zip from 'gulp-zip';
 import git from 'gulp-git';
 import {Server} from 'karma';
+import webpack from 'webpack-stream';
+import babel from 'gulp-babel';
+import webpackConfig from './webpack.config';
 
 let version;
 
@@ -160,6 +163,19 @@ gulp.task('lint', () => {
         .pipe(jshint())
         .pipe(jshint.reporter('jshint-stylish'))
         .pipe(jshint.reporter('fail'));
+});
+
+gulp.task('transpile', () => {
+   return gulp.src(['src/**/*.js', '!src/**/*-compiled.js'])
+       .pipe(babel())
+       .pipe(gulp.dest('temp'));
+});
+
+gulp.task('webpack', ['transpile'], () => {
+    return gulp.src('temp/main.js')
+        .pipe(babel())
+        .pipe(webpack(webpackConfig))
+        .pipe(gulp.dest('.'));
 });
 
 gulp.task('default', ['build']);

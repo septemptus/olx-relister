@@ -1,30 +1,28 @@
-/* global moment, constants */
-(function () {
-    'use strict';
+import moment from 'moment';
+import constants from 'constants';
 
-    var classes = constants.classes,
-        formats = constants.formats;
+const CLASSES = constants.CLASSES;
+const FORMATS = constants.FORMATS;
 
-    function flash(isError) {
-        var className = isError ? classes.ERROR : classes.SUCCESS;
+function flash(isError) {
+    let className = isError ? CLASSES.ERROR : CLASSES.SUCCESS;
 
-        document.body.classList.add(className);
+    document.body.classList.add(className);
 
-        setTimeout(function () {
-            document.body.classList.remove(className);
-        }, 500);
+    setTimeout(() => {
+        document.body.classList.remove(className);
+    }, 500);
+}
+
+function createHour(hour) {
+    if (!hour) {
+        return '';
     }
 
-    function createHour(hour) {
-        if (!hour) {
-            return '';
-        }
+    return moment().hour(hour.hour).minute(hour.minute).format(FORMATS.HOUR_FORMAT);
+}
 
-        return moment().hour(hour.hour).minute(hour.minute).format(formats.HOUR_FORMAT);
-    }
-
-    window.utils = {
-        createHour: createHour,
-        flash: flash
-    };
-}());
+export default {
+    createHour: createHour,
+    flash: flash
+};

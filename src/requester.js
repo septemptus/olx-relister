@@ -1,45 +1,43 @@
-/* global logStore, Q */
-(function () {
-    "use strict";
-    function request(urls) {
-        logStore.log('Sending requests');
+import logStore from './log-store';
+import Q from 'q';
 
-        function startNextRequest(urls) {
-            var xhr = new XMLHttpRequest(),
-                xhrDeferred = Q.defer(),
-                url = urls[0];
+function request(urls) {
+    logStore.log('Sending requests');
 
-            if (!url) {
+    function startNextRequest(url, ...restOfUrls) {
+        let xhr = new XMLHttpRequest();
+        let xhrDeferred = Q.defer();
+
+        if (!url) {
+            xhrDeferred.resolve();
+            return xhrDeferred.promise;
+        }
+
+        logStore.log('Sending request for', url);
+
+        xhr.open('GET', url);
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                logStore.log('Request for', url, 'was successful');
                 xhrDeferred.resolve();
-                return xhrDeferred.promise;
+            } else if (xhr.readyState === 4 && xhr.status !== 200) {
+                logStore.log('Request for', url, 'failed');
+                xhrDeferred.reject();
             }
+        };
+        xhr.send();
 
-            logStore.log('Sending request for', url);
-
-            xhr.open('GET', url);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    logStore.log('Request for', url, 'was successful');
-                    xhrDeferred.resolve();
-                } else if (xhr.readyState === 4 && xhr.status !== 200) {
-                    logStore.log('Request for', url, 'failed');
-                    xhrDeferred.reject();
-                }
-            };
-            xhr.send();
-
-            return xhrDeferred.promise.then(startNextRequest.bind(null, urls.slice(1)));
-        }
-
-        if (urls && urls.length) {
-            return startNextRequest(urls);
-        }
-
-        logStore.log('No requests sent');
-        return Q.when();
+        return xhrDeferred.promise.then(startNextRequest.bind(null, restOfUrls));
     }
 
-    window.requester = {
-        request: request
-    };
-}());
+    if (urls && urls.length) {
+        return startNextRequest(urls);
+    }
+
+    logStore.log('No requests sent');
+    return Q.when();
+}
+
+export default {
+    request: request
+};

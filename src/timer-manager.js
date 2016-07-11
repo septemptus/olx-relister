@@ -1,83 +1,84 @@
-/* global Q, chrome, settings, moment, logStore */
-(function () {
-    'use strict';
+import settings from './settings';
+import logStore from './log-store';
+import moment from 'moment';
+import Q from 'q';
+import chrome from 'chrome';
 
-    var TIMER_NAME = 'olx.timer';
+const TIMER_NAME = 'olx.timer';
 
-    function getNextCheck(settings) {
-        var target = moment(Date.now());
+function getNextCheck(settings) {
+    let target = moment(Date.now());
 
-        if (!settings.checkHour) {
-            throw 'Check hour is not defined';
+    if (!settings.checkHour) {
+        throw 'Check hour is not defined';
+    }
+
+    target
+        .hour(settings.checkHour.hour)
+        .minute(settings.checkHour.minute)
+        .startOf('minute');
+
+    if (target.isBefore(moment(Date.now()))) {
+        target.add({ days: 1 });
+    }
+
+    return target.valueOf();
+}
+
+function set(nextCheck) {
+    logStore.log('Setting timer', nextCheck);
+    chrome.alarms.create(TIMER_NAME, { when: nextCheck });
+
+    return settings.save({
+        nextCheck: nextCheck
+    });
+}
+
+function initialize() {
+    return settings.load().then((loadedSettings) => {
+        let nextCheck = loadedSettings.nextCheck;
+
+        logStore.log('Checking timer', nextCheck);
+
+        if (!nextCheck) {
+            logStore.log('No timer to set, moving on');
+
+            return Q.when();
         }
 
-        target
-            .hour(settings.checkHour.hour)
-            .minute(settings.checkHour.minute)
-            .startOf('minute');
-
-        if (target.isBefore(moment(Date.now()))) {
-            target.add({ days: 1 });
+        if (moment(nextCheck).isBefore(moment())) {
+            logStore.log('Timer passed, setting new');
+            nextCheck = Date.now();
         }
 
-        return target.valueOf();
-    }
+        return set(nextCheck);
+    });
+}
 
-    function set(nextCheck) {
-        logStore.log('Setting timer', nextCheck);
-        chrome.alarms.create(TIMER_NAME, { when: nextCheck });
+function setNew() {
+    return settings.load().then((loadedSettings) => {
+        return set(getNextCheck(loadedSettings));
+    });
+}
 
-        return settings.save({
-            nextCheck: nextCheck
-        });
-    }
+function clear() {
+    let deferred = Q.defer();
 
-    function initialize() {
-        return settings.load().then(function (loadedSettings) {
-            var nextCheck = loadedSettings.nextCheck;
+    logStore.log('Clearing timer');
 
-            logStore.log('Checking timer', nextCheck);
+    chrome.alarms.clear(TIMER_NAME, () => {
+        settings.save({
+                nextCheck: null
+            })
+            .then(deferred.resolve)
+            .fail(deferred.reject);
+    });
 
-            if (!nextCheck) {
-                logStore.log('No timer to set, moving on');
+    return deferred.promise;
+}
 
-                return Q.when();
-            }
-
-            if (moment(nextCheck).isBefore(moment())) {
-                logStore.log('Timer passed, setting new');
-                nextCheck = Date.now();
-            }
-
-            return set(nextCheck);
-        });
-    }
-
-    function setNew() {
-        return settings.load().then(function (loadedSettings) {
-            return set(getNextCheck(loadedSettings));
-        });
-    }
-
-    function clear() {
-        var deferred = Q.defer();
-
-        logStore.log('Clearing timer');
-
-        chrome.alarms.clear(TIMER_NAME, function () {
-            settings.save({
-                    nextCheck: null
-                })
-                .then(deferred.resolve)
-                .fail(deferred.reject);
-        });
-
-        return deferred.promise;
-    }
-
-    window.timerManager = {
-        initialize: initialize,
-        setNew: setNew,
-        clear: clear
-    };
-}());
+export default {
+    initialize: initialize,
+    setNew: setNew,
+    clear: clear
+};
